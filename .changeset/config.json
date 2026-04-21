@@ -3,11 +3,11 @@
 	"changelog": [
 		"@savvy-web/changesets/changelog",
 		{
-			"repo": "spencerbeggs/pnpm-module-template"
+			"repo": "spencerbeggs/vitest-bats"
 		}
 	],
 	"commit": false,
-	"access": "restricted",
+	"access": "public",
 	"baseBranch": "main",
 	"updateInternalDependencies": "patch",
 	"ignore": [],

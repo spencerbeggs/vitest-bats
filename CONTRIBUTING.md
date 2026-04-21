@@ -1,65 +1,133 @@
 # Contributing
 
-> **Template placeholder** — Replace this file with contribution guidelines
-> specific to your project when you clone this template.
+Contributions are welcome. This guide covers setup, workflow, and conventions.
 
-## Writing a Good CONTRIBUTING.md
+## Prerequisites
 
-A CONTRIBUTING.md file sets expectations for contributors and reduces friction
-in the review process. Below are best practices for writing one.
+- **Node.js** 24+
+- **pnpm** 10.33+
+- **System tools**: bats, bats-support, bats-assert, bats-mock, jq
+- **Optional**: kcov (Linux only -- coverage collection), Docker (macOS
+  coverage)
 
-### What to Include
+### macOS
 
-**Prerequisites and setup** — List required tools (Node.js version, package
-manager, etc.) and the steps to get a working development environment. Keep it
-copy-pasteable:
+```bash
+brew install bats-core bats-support bats-assert bats-mock jq kcov
+```
 
-```text
-git clone <repo-url>
-cd <project>
+### Linux (Debian/Ubuntu)
+
+```bash
+apt-get install -y bats bats-support bats-assert bats-file jq kcov
+```
+
+## Setup
+
+```bash
+git clone https://github.com/spencerbeggs/vitest-bats.git
+cd vitest-bats
 pnpm install
-pnpm run build
 pnpm run test
 ```
 
-**Project structure** — A brief overview of the directory layout so
-contributors know where to find things. A simple tree diagram works well.
+## Project Structure
 
-**Development workflow** — Explain how to run the project locally, run tests,
-lint, and type-check. List the key scripts from `package.json` in a table.
+```text
+package/              Published npm package (vitest-bats)
+  src/                Package source code
+  __test__/           Package unit tests
+scripts/              Example shell scripts for testing
+__test__/             Integration tests consuming the package
+Dockerfile.test       Docker environment for kcov on macOS
+docker-compose.test.yml
+```
 
-**Branching and commit conventions** — Describe your branch naming scheme and
-commit message format. If you use conventional commits, link to the spec and
-show an example. If DCO signoff is required, explain how to add it.
+The root workspace (`@spencerbeggs/vitest-bats`) is the development harness.
+The publishable package lives in `package/` and is consumed via
+`vitest-bats: workspace:*`.
 
-**How to submit changes** — Walk through the fork-branch-PR workflow step by
-step. Mention any CI checks that must pass before review.
+## Development Workflow
 
-**Code style** — Point to your linter/formatter config rather than restating
-rules. If there are conventions the tooling does not enforce (naming, file
-organization, import ordering), document those here.
+### Key Commands
 
-**Testing expectations** — State whether new code needs tests, what coverage
-threshold applies, and how to run the test suite. Mention any special test
-categories (unit, integration, e2e) and their naming conventions.
+| Command | Purpose |
+| --- | --- |
+| `pnpm run test` | Run all tests |
+| `pnpm run test:watch` | Tests in watch mode |
+| `pnpm run test:coverage` | Tests with v8 coverage |
+| `pnpm run build` | Build dev + prod outputs |
+| `pnpm run lint` | Biome lint + format check |
+| `pnpm run lint:fix` | Auto-fix lint issues |
+| `pnpm run typecheck` | Type-check via tsgo |
 
-**Issue and PR etiquette** — Explain how to file a good bug report, how to
-propose a feature, and what reviewers look for in a PR. Link to issue templates
-if you have them.
+### Running a Specific Test
 
-**Changesets** — If you use changesets for versioning, explain when a changeset
-is needed and how to create one.
+```bash
+pnpm vitest run __test__/hello.test.ts
+```
 
-**License** — State the project license and clarify that contributions are
-made under the same terms.
+### Building the Package
 
-### Tips
+```bash
+cd package
+pnpm run build:dev    # Development build
+pnpm run build:prod   # Production build
+```
 
-- Keep it concise. A wall of text discourages reading.
-- Use headings and lists so contributors can scan for what they need.
-- Link to external docs (conventional commits spec, DCO explanation) rather
-  than reproducing them inline.
-- Update CONTRIBUTING.md when workflows change. Stale docs are worse than no
-  docs.
-- Consider adding a "First-time contributors" section pointing to good starter
-  issues.
+## Code Style
+
+This project uses [Biome](https://biomejs.dev/) for linting and formatting.
+Configuration extends `@savvy-web/lint-staged/biome/silk.jsonc`. Run
+`pnpm run lint:fix` before committing.
+
+### Import Conventions
+
+- Use `.js` extensions for relative imports (ESM requirement)
+- Use `node:` protocol for Node.js built-ins (`import fs from 'node:fs'`)
+- Separate type imports: `import type { Foo } from './bar.js'`
+
+## Testing
+
+Tests live in `__test__/`, never co-located in `src/`. See
+[`__test__/CLAUDE.md`](__test__/CLAUDE.md) for the full directory structure.
+
+- Unit tests: `__test__/*.test.ts`
+- E2e tests: `__test__/e2e/*.e2e.test.ts`
+- Integration tests: `__test__/integration/*.int.test.ts`
+
+Coverage collection requires kcov on Linux. On macOS, tests run but kcov
+coverage is not collected. Use Docker for macOS coverage -- see
+[docs/docker-coverage.md](docs/docker-coverage.md).
+
+## Commits
+
+All commits require:
+
+1. **Conventional commit format** -- `feat:`, `fix:`, `chore:`, etc. See the
+   [Conventional Commits spec](https://www.conventionalcommits.org/).
+2. **DCO signoff** -- `Signed-off-by: Your Name <email@example.com>`
+
+Git hooks enforce both requirements automatically.
+
+## Pull Requests
+
+1. Fork the repository and create a feature branch
+2. Make your changes with tests
+3. Ensure `pnpm run test` and `pnpm run lint` pass
+4. Submit a PR against `main`
+
+## Changesets
+
+This project uses
+[@savvy-web/changesets](https://github.com/savvy-web/changesets) for
+versioning. If your change affects the published package, add a changeset:
+
+```bash
+pnpm changeset
+```
+
+## License
+
+By contributing, you agree that your contributions will be licensed under the
+[MIT License](LICENSE).

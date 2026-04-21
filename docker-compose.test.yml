@@ -1,0 +1,30 @@
+services:
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    privileged: true
+    volumes:
+      # Mount coverage directory to access reports from host
+      - ./coverage:/workspace/coverage
+      # Mount source files for development
+      - ./package/src:/workspace/package/src
+      - ./scripts:/workspace/scripts
+      - ./__test__:/workspace/__test__
+      - ./vitest.config.ts:/workspace/vitest.config.ts
+    cap_add:
+      # Required for kcov to attach to bash processes for coverage collection
+      - SYS_PTRACE
+    security_opt:
+      # Disable AppArmor to allow kcov ptrace
+      - apparmor:unconfined
+    environment:
+      - CI=true
+      # Pass through FORCE_HTE_LINKS to enable clickable links in WezTerm/VSCode
+      # Set FORCE_HTE_LINKS=1 on host to enable: FORCE_HTE_LINKS=1 pnpm test:docker
+      - FORCE_HTE_LINKS=${FORCE_HTE_LINKS:-0}
+      # Pass through HTE_PATH_REWRITE to convert container paths to host paths in hyperlinks
+      # Format: container_prefix:host_prefix (e.g., /workspace:/Users/spencer/project)
+      # This enables VSCode to open files from clickable links generated inside Docker
+      - HTE_PATH_REWRITE=${HTE_PATH_REWRITE:-}
+    command: pnpm test:local

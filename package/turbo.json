@@ -1,0 +1,52 @@
+{
+	"extends": ["//"],
+	"tasks": {
+		"build:dev": {
+			"cache": true,
+			"dependsOn": ["types:check"],
+			"inputs": [
+				"$TURBO_DEFAULT$",
+				"!**/*.test.ts",
+				"!**/*.spec.ts",
+				"!**/*.md",
+				"!.rslib/**",
+				"!dist/**",
+				"!.turbo/**"
+			],
+			"outputLogs": "errors-only",
+			"outputs": ["dist/dev/**", ".rslib/declarations/dev/**"]
+		},
+		"build:prod": {
+			"cache": true,
+			"dependsOn": ["types:check"],
+			"inputs": [
+				"$TURBO_DEFAULT$",
+				"!**/*.test.ts",
+				"!**/*.spec.ts",
+				"!**/*.md",
+				"!.rslib/**",
+				"!dist/**",
+				"!.turbo/**"
+			],
+			"outputs": ["dist/npm/**", "dist/github/**", ".rslib/declarations/npm/**", ".rslib/declarations/github/**"]
+		},
+		"types:check": {
+			"cache": true,
+			"dependsOn": [],
+			"inputs": [
+				"$TURBO_DEFAULT$",
+				"!**/*.md",
+				"!.changeset/**",
+				"!.claude/**",
+				"!.github/**",
+				"!.husky/**",
+				"!.vscode/**",
+				"!.rslib/**",
+				"!dist/**",
+				"!.turbo/**"
+			],
+			"outputLogs": "errors-only",
+			"outputs": ["dist/.tsbuildinfo.lib"]
+		}
+	}
+}

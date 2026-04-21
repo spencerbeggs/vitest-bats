@@ -1,6 +1,13 @@
-import { VitestConfig } from "@savvy-web/vitest";
+import { defineConfig } from "vitest/config";
+import { BatsPlugin } from "vitest-bats";
 
-export default VitestConfig.create({
-	coverage: VitestConfig.COVERAGE_LEVELS.none,
-	coverageTargets: VitestConfig.COVERAGE_LEVELS.standard,
+export default defineConfig({
+	plugins: [BatsPlugin()],
+	test: {
+		include: ["__test__/**/*.test.ts"],
+		testTimeout: 30000,
+		coverage: {
+			provider: "v8",
+		},
+	},
 });

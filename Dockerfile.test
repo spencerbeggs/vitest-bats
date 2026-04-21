@@ -1,0 +1,82 @@
+FROM node:24-bullseye
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    bash \
+    binutils \
+    libdw-dev \
+    libiberty-dev \
+    libcurl4-openssl-dev \
+    zlib1g-dev \
+    python3 \
+    cmake \
+    pkg-config \
+    jq \
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -sf /bin/bash /bin/sh
+
+# Install kcov from source (latest version for better bash support)
+RUN cd /tmp && \
+    git clone --depth 1 https://github.com/SimonKagstrom/kcov.git && \
+    cd kcov && \
+    mkdir build && \
+    cd build && \
+    cmake .. && \
+    make && \
+    make install && \
+    cd / && \
+    rm -rf /tmp/kcov
+
+# Install BATS
+RUN cd /tmp && \
+    git clone --depth 1 https://github.com/bats-core/bats-core.git && \
+    cd bats-core && \
+    ./install.sh /usr/local && \
+    cd / && \
+    rm -rf /tmp/bats-core
+
+# Install bats-support library
+RUN mkdir -p /usr/local/lib && \
+    cd /tmp && \
+    git clone --depth 1 https://github.com/bats-core/bats-support.git && \
+    cp -r bats-support /usr/local/lib/ && \
+    rm -rf /tmp/bats-support
+
+# Install bats-assert library
+RUN mkdir -p /usr/local/lib && \
+    cd /tmp && \
+    git clone --depth 1 https://github.com/bats-core/bats-assert.git && \
+    cp -r bats-assert /usr/local/lib/ && \
+    rm -rf /tmp/bats-assert
+
+# Install bats-mock for command mocking
+RUN mkdir -p /usr/local/lib/bats-mock && \
+    cd /tmp && \
+    git clone --depth 1 https://github.com/jasonkarns/bats-mock.git && \
+    cp bats-mock/stub.bash bats-mock/binstub /usr/local/lib/bats-mock/ && \
+    chmod +x /usr/local/lib/bats-mock/binstub && \
+    echo 'source "$(dirname "${BASH_SOURCE[0]}")/stub.bash"' > /usr/local/lib/bats-mock/load.bash && \
+    rm -rf /tmp/bats-mock
+
+# Install pnpm
+RUN npm install -g pnpm@10.20.0
+
+# Set working directory
+WORKDIR /workspace
+
+# Copy package files
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy the rest of the project
+COPY . .
+
+# Make shell scripts executable
+RUN find . -name "*.sh" -type f -exec chmod +x {} \;
+
+# Default command: run tests with coverage
+CMD ["pnpm", "test:local"]

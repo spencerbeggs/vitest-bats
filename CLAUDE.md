@@ -3,32 +3,41 @@
 This file provides guidance to Claude Code when working with code in this
 repository.
 
-## Project Status
+## Project Overview
 
-This is a **base template repository** for developing and publishing Node.js
-modules to npm and GitHub Packages. It is not a working library — it contains
-placeholder source code in `src/` that should be replaced when starting a new
-project.
+**vitest-bats** is a Vitest plugin for testing shell scripts via BATS (Bash
+Automated Testing System) with kcov coverage collection. It merges shell script
+coverage into Vitest's v8 Istanbul CoverageMap for unified reporting.
 
-The design documentation system is available via Claude Code skills and agents
-but no design docs exist yet in this template.
+The publishable package lives in `package/`. The root workspace consumes it via
+`vitest-bats: workspace:*` and serves as both development harness and
+integration test suite.
 
-## Getting Started (After Cloning This Template)
+## Workspace Structure
 
-When starting a new project from this template, follow this lifecycle:
+```text
+vitest-bats/
+  package/              # npm package (published as `vitest-bats`)
+  scripts/              # Example shell scripts for testing
+  __test__/             # Integration tests consuming the package
+  Dockerfile.test       # Docker env for kcov (macOS SIP workaround)
+  docker-compose.test.yml
+```
 
-1. **Rename the package** — Update `name` in `package.json` (e.g.,
-   `@spencerbeggs/my-new-lib`), update `repository.url` and `homepage`, and
-   update the `repo` field in `.changeset/config.json`
-2. **Replace placeholder code** — Delete the example `Foo`/`Bar` code in
-   `src/index.ts` and `src/index.test.ts`
-3. **Initialize design documentation** — Run `/design-init` to create your
-   first design document describing the library's architecture
-4. **Follow the design-first workflow** — Design docs → `/plan-create` →
-   implementation. This ensures Claude understands the full architecture before
-   writing code
-5. **Implement iteratively** — Use the plan to guide implementation, updating
-   design docs as the architecture evolves
+This is a pnpm workspace. The root `package.json` is `@spencerbeggs/vitest-bats`
+(private, not published). The package at `package/` is `vitest-bats` (published).
+
+## Key APIs
+
+- **`BatsPlugin()`** -- Vitest plugin. Add to `plugins` array in
+  `vitest.config.ts`. Handles dependency detection, reporter injection, and
+  environment setup.
+- **`BatsHelper.describe(scriptPath, fn)`** -- Test-writing API. Wraps
+  `vitest.describe()` with BATS lifecycle. Tests use fluent assertion builder.
+- **`BatsCoverageReporter`** -- Merges kcov cobertura.xml data into v8
+  Istanbul CoverageMap via `onCoverage()` hook.
+
+See `package/CLAUDE.md` for package-specific guidance.
 
 ## Build Pipeline
 
@@ -38,30 +47,15 @@ produce dual build outputs via [Rslib](https://rslib.rs/):
 
 | Output | Directory | Purpose |
 | ------ | --------- | ------- |
-| Development | `dist/dev/` | Local development with source maps |
-| Production | `dist/npm/` | Published to npm and GitHub Packages |
+| Development | `package/dist/dev/` | Local development with source maps |
+| Production | `package/dist/npm/` | Published to npm and GitHub Packages |
 
 ### How `private: true` Works
 
-The source `package.json` is marked `"private": true` — **this is intentional
-and correct**. During the build, rslib-builder reads the `publishConfig` field
-and transforms the output `package.json`:
-
-- Sets `"private": false` based on `publishConfig.access`
-- Rewrites `exports` to point at compiled output
-- Strips `devDependencies`, `scripts`, `publishConfig`, and `devEngines`
-
-The `rslib.config.ts` `transform()` callback controls what gets removed. Never
-manually set `"private": false` in the source `package.json`.
-
-### Publish Targets
-
-The `publishConfig.targets` array defines where packages are published:
-
-- **GitHub Packages** — `https://npm.pkg.github.com/` (from `dist/npm/`)
-- **npm registry** — `https://registry.npmjs.org/` (from `dist/npm/`)
-
-Both targets publish with provenance attestation enabled.
+The source `package.json` files are marked `"private": true` -- this is
+intentional. During the build, rslib-builder reads `publishConfig` and
+transforms the output `package.json` (sets `private: false`, rewrites exports,
+strips dev fields). Never manually set `"private": false` in source.
 
 ### Turbo Orchestration
 
@@ -72,23 +66,6 @@ Both targets publish with provenance attestation enabled.
 - Cache excludes: `*.md`, `.changeset/**`, `.claude/**`, `.github/**`,
   `.husky/**`, `.vscode/**`
 - Environment pass-through: `GITHUB_ACTIONS`, `CI`
-
-## Savvy-Web Tool References
-
-This template depends on several `@savvy-web/*` packages. These are in active
-development — if behavior seems unexpected, explore both the GitHub docs and the
-installed source.
-
-| Package | Purpose | GitHub | Local Source |
-| ------- | ------- | ------ | ------------ |
-| rslib-builder | Build pipeline, dual output, package.json transform | [savvy-web/rslib-builder](https://github.com/savvy-web/rslib-builder) | `node_modules/@savvy-web/rslib-builder/` |
-| commitlint | Conventional commit + DCO enforcement | [savvy-web/commitlint](https://github.com/savvy-web/commitlint) | `node_modules/@savvy-web/commitlint/` |
-| changesets | Versioning, changelogs, release management | [savvy-web/changesets](https://github.com/savvy-web/changesets) | `node_modules/@savvy-web/changesets/` |
-| lint-staged | Pre-commit file linting via Biome | [savvy-web/lint-staged](https://github.com/savvy-web/lint-staged) | `node_modules/@savvy-web/lint-staged/` |
-| vitest | Vitest config factory with project support | [savvy-web/vitest](https://github.com/savvy-web/vitest) | `node_modules/@savvy-web/vitest/` |
-
-TypeScript configuration extends from rslib-builder:
-`@savvy-web/rslib-builder/tsconfig/ecma/lib.json`
 
 ## Commands
 
@@ -112,26 +89,14 @@ pnpm run test:coverage     # Run tests with v8 coverage report
 pnpm run build             # Build dev + prod outputs via Turbo
 pnpm run build:dev         # Build development output only
 pnpm run build:prod        # Build production/npm output only
-pnpm run build:inspect     # Inspect production build config (verbose)
-```
-
-### Running a Specific Test
-
-```bash
-pnpm vitest run src/index.test.ts
 ```
 
 ## Code Quality and Hooks
 
 ### Biome
 
-Unified linter and formatter replacing ESLint + Prettier. Configuration in
-`biome.jsonc` extends `@savvy-web/lint-staged/biome/silk.jsonc`.
-
-### Commitlint
-
-Enforces conventional commit format with DCO signoff. Configuration in
-`lib/configs/commitlint.config.ts` uses the `CommitlintConfig.silk()` preset.
+Unified linter and formatter. Configuration in `biome.jsonc` extends
+`@savvy-web/lint-staged/biome/silk.jsonc`.
 
 ### Husky Git Hooks
 
@@ -142,11 +107,6 @@ Enforces conventional commit format with DCO signoff. Configuration in
 | `pre-push` | Runs tests for affected packages using Turbo |
 | `post-checkout` | Package manager setup |
 | `post-merge` | Package manager setup |
-
-### Lint-Staged
-
-Configuration in `lib/configs/lint-staged.config.ts` uses the `Preset.silk()`
-preset from `@savvy-web/lint-staged`.
 
 ## Conventions
 
@@ -165,18 +125,16 @@ All commits require:
 
 ### Publishing
 
-Packages publish to both GitHub Packages and npm with provenance via the
-[@savvy-web/changesets](https://github.com/savvy-web/changesets) release
-workflow. The GitHub Action is at
-[savvy-web/workflow-release-action](https://github.com/savvy-web/workflow-release-action).
+Packages publish to both GitHub Packages and npm with provenance via
+[@savvy-web/changesets](https://github.com/savvy-web/changesets).
 
 ## Testing
 
 - **Framework**: [Vitest](https://vitest.dev/) with v8 coverage provider
 - **Pool**: Uses `forks` (not threads) for broader compatibility
-- **Config**: `vitest.config.ts` uses the `VitestConfig.create()` factory from
-  `@savvy-web/vitest`, which supports project-based filtering via `--project`
-- **CI**: `pnpm run ci:test` sets `CI=true` and enables coverage
+- **Config**: `vitest.config.ts` uses `BatsPlugin()` from `vitest-bats` and
+  includes `__test__/**/*.test.ts`
+- **Docker**: Use `docker-compose.test.yml` for full kcov coverage on macOS
 
 ### Test Directory
 
@@ -186,5 +144,25 @@ All tests live in `__test__/`, never co-located in `src/`. See
 - Unit tests: `__test__/*.test.ts`
 - E2e tests: `__test__/e2e/*.e2e.test.ts`
 - Integration tests: `__test__/integration/*.int.test.ts`
-- Shared mocks and helpers go in the `utils/` subdirectory for each category
-- Static test data goes in the `fixtures/` subdirectory for each category
+
+## Design Documentation
+
+Detailed architecture and API reference are in design docs.
+
+**When working on these areas, load relevant context:**
+
+- Architecture and data flow: `@./.claude/design/vitest-bats/architecture.md`
+- Full API reference: `@./.claude/design/vitest-bats/api-reference.md`
+
+Load these docs when modifying package internals, adding new exports, or
+changing the coverage pipeline. **Do NOT load unless directly relevant.**
+
+## Savvy-Web Tool References
+
+| Package | Purpose |
+| ------- | ------- |
+| rslib-builder | Build pipeline, dual output, package.json transform |
+| commitlint | Conventional commit + DCO enforcement |
+| changesets | Versioning, changelogs, release management |
+| lint-staged | Pre-commit file linting via Biome |
+| vitest | Vitest config factory with project support |

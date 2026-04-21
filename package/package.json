@@ -1,0 +1,74 @@
+{
+	"name": "vitest-bats",
+	"version": "0.0.0",
+	"private": true,
+	"description": "Test bash scripts with kcov coverage directly in Vitest",
+	"keywords": ["vitest", "bats", "bash", "shell", "testing", "kcov", "coverage", "vitest-plugin"],
+	"homepage": "https://github.com/spencerbeggs/vitest-bats#readme",
+	"bugs": {
+		"url": "https://github.com/spencerbeggs/vitest-bats/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/spencerbeggs/vitest-bats.git",
+		"directory": "package"
+	},
+	"license": "MIT",
+	"author": {
+		"name": "C. Spencer Beggs",
+		"email": "spencer@beggs.codes",
+		"url": "https://spencerbeg.gs"
+	},
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts",
+		"./provider": "./src/provider.ts"
+	},
+	"scripts": {
+		"build:dev": "rslib build --config-loader native --env-mode dev",
+		"build:inspect": "rslib inspect --config-loader native --env-mode npm --verbose",
+		"build:prod": "rslib build --config-loader native --env-mode npm",
+		"prepare": "turbo run build:dev build:prod --log-order=grouped",
+		"types:check": "tsgo --noEmit"
+	},
+	"dependencies": {
+		"fast-xml-parser": "^5.7.1",
+		"minimatch": "^10.2.5"
+	},
+	"devDependencies": {
+		"@savvy-web/rslib-builder": "^0.20.1",
+		"@types/node": "catalog:silk",
+		"@typescript/native-preview": "catalog:silk",
+		"tsx": "catalog:silk",
+		"typescript": "catalog:silk"
+	},
+	"peerDependencies": {
+		"vitest": ">=3.0.0"
+	},
+	"peerDependenciesMeta": {
+		"vitest": {
+			"optional": false
+		}
+	},
+	"publishConfig": {
+		"access": "public",
+		"directory": "dist/dev",
+		"linkDirectory": true,
+		"targets": [
+			{
+				"protocol": "npm",
+				"registry": "https://npm.pkg.github.com/",
+				"directory": "dist/github",
+				"access": "public",
+				"provenance": true
+			},
+			{
+				"protocol": "npm",
+				"registry": "https://registry.npmjs.org/",
+				"directory": "dist/npm",
+				"access": "public",
+				"provenance": true
+			}
+		]
+	}
+}

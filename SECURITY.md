@@ -8,7 +8,8 @@
 
 ## Reporting a Vulnerability
 
-To report a security vulnerability, please email [security@beggs.codes](mailto:security@spencerbeg.gs).
+To report a security vulnerability, please email
+[security@beggs.codes](mailto:security@beggs.codes).
 
 Please include:
 
@@ -17,4 +18,6 @@ Please include:
 - Potential impact
 - Any suggested fixes (optional)
 
-We will acknowledge receipt within 72 hours and provide updates as we investigate. We appreciate responsible disclosure and will credit reporters in release notes unless anonymity is requested.
+We will acknowledge receipt within 72 hours and provide updates as we
+investigate. We appreciate responsible disclosure and will credit reporters in
+release notes unless anonymity is requested.
