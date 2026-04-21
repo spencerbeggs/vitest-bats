@@ -13,6 +13,7 @@
 **/.vitest
 **/.cache
 coverage/
+.vitest-bats-cache/
 **/*.asc
 pnpm-publish-summary.json
 pnpm-release.json

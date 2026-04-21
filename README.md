@@ -1,73 +1,136 @@
-# pnpm-module-template
+# vitest-bats
 
-A personal template repository by
-[C. Spencer Beggs](https://spencerbeg.gs) for developing and publishing Node.js
-modules to [npm](https://www.npmjs.com/) and
-[GitHub Packages](https://github.com/features/packages).
+Test bash scripts with [BATS](https://github.com/bats-core/bats-core) directly
+in [Vitest](https://vitest.dev/), with
+[kcov](https://github.com/SimonKagstrom/kcov) coverage merged into your
+existing v8 coverage report.
 
-You're welcome to clone or fork this template for your own use.
+## Features
 
-## What's Included
-
-- **Build pipeline** — Dual-output builds (development + production) via
-  [Rslib](https://rslib.rs/) with automatic `package.json` transformation for
-  publishing
-- **Code quality** — [Biome](https://biomejs.dev/) for linting and formatting,
-  with git hooks for pre-commit checks and commit message validation
-- **Testing** — [Vitest](https://vitest.dev/) with v8 coverage
-- **Versioning** — [Changesets](https://github.com/changesets/changesets) for
-  version management and changelog generation
-- **CI/CD** — GitHub Actions for automated testing, building, and publishing
-  with provenance attestation
-- **TypeScript** — Strict mode, composite builds, ESM-first with `.js` import
-  extensions
+- **Vitest plugin** -- `BatsPlugin()` handles all setup: dependency detection,
+  reporter injection, environment configuration
+- **TypeScript test API** -- `BatsHelper.describe()` lets you write BATS tests
+  in TypeScript with a fluent assertion builder
+- **Unified coverage** -- `BatsCoverageReporter` merges kcov shell script
+  coverage into Vitest's v8 Istanbul CoverageMap
+- **Terminal hyperlinks** -- OSC 8 clickable links in supported terminals
+  (VSCode, WezTerm, iTerm2)
+- **Docker support** -- Dockerfile and Compose config for full kcov coverage on
+  macOS (where SIP blocks ptrace)
 
 ## Quick Start
 
-1. Click **"Use this template"** on GitHub (or clone the repo directly)
-2. Update `package.json` with your package name, repository URL, and homepage
-3. Update the `repo` field in `.changeset/config.json`
-4. Replace the placeholder code in `src/` with your own
-5. Install dependencies:
+Install:
 
-   ```bash
-   pnpm install
-   ```
+```bash
+npm install --save-dev vitest-bats vitest
+```
 
-6. Start developing:
+Configure `vitest.config.ts`:
 
-   ```bash
-   pnpm run test:watch    # Run tests in watch mode
-   pnpm run lint:fix      # Auto-fix lint issues
-   pnpm run build         # Build dev + prod outputs
-   ```
+```typescript
+import { defineConfig } from "vitest/config";
+import { BatsPlugin } from "vitest-bats";
+
+export default defineConfig({
+  plugins: [BatsPlugin()],
+  test: {
+    include: ["__test__/**/*.test.ts"],
+    coverage: {
+      provider: "v8",
+    },
+  },
+});
+```
+
+Write a test:
+
+```typescript
+import { BatsHelper } from "vitest-bats";
+
+const scriptPath = import.meta.resolve("../scripts/hello.sh");
+
+BatsHelper.describe(scriptPath, (helper) => {
+  helper.test("outputs default greeting", (script) => {
+    script.run('"$SCRIPT"');
+    script.assert_success();
+    script.assert_output({ partial: "Hello World" });
+  });
+
+  helper.test("greets by name", (script) => {
+    script.run('"$SCRIPT" --name Alice');
+    script.assert_success();
+    script.assert_output({ partial: "Hello Alice" });
+  });
+
+  helper.test("outputs JSON", (script) => {
+    script.run('"$SCRIPT" --json');
+    script.assert_success();
+    script.assert_json_value("greeting", "Hello World");
+  });
+});
+```
+
+Run tests:
+
+```bash
+vitest run
+```
+
+## System Dependencies
+
+BatsPlugin checks for these at startup and reports what is missing:
+
+| Dependency | Required | Install (macOS) | Install (Linux) |
+| --- | --- | --- | --- |
+| bats | Yes | `brew install bats-core` | `apt-get install bats` |
+| bats-support | Yes | `brew install bats-support` | `apt-get install bats-support` |
+| bats-assert | Yes | `brew install bats-assert` | `apt-get install bats-assert` |
+| bats-mock | Yes | `brew install bats-mock` | `apt-get install bats-file` |
+| jq | Yes | `brew install jq` | `apt-get install jq` |
+| kcov | Coverage only | `brew install kcov` | `apt-get install kcov` |
+
+kcov coverage collection requires Linux. On macOS, tests run but coverage is
+not collected due to SIP restrictions on ptrace. Use Docker for full coverage
+on macOS -- see [docs/docker-coverage.md](docs/docker-coverage.md).
+
+## Documentation
+
+- [Testing Helpers API](docs/testing-helpers.md) -- `script.mock()`,
+  `script.assert_json_value()`, and advanced usage
+- [Non-Executable Scripts](docs/non-executable-scripts.md) -- Testing scripts
+  without the executable bit
+- [Docker Coverage](docs/docker-coverage.md) -- Running kcov in Docker on macOS
 
 ## Project Structure
 
 ```text
-src/               Source code and tests
-lib/configs/       Shared tool configurations (commitlint, lint-staged, markdownlint)
-dist/dev/          Development build output
-dist/npm/          Production build output (published to registries)
-.github/workflows/ CI/CD workflows
-.changeset/        Changeset configuration
+package/           Published npm package (vitest-bats)
+scripts/           Example shell scripts for testing
+__test__/          Integration tests consuming the package
+Dockerfile.test    Docker environment for kcov coverage
+docker-compose.test.yml
 ```
 
-## Publishing
+This is a pnpm workspace. The root package (`@spencerbeggs/vitest-bats`) is
+private and serves as the development harness. The publishable code lives in
+`package/`.
 
-Packages are published to both npm and GitHub Packages with provenance
-attestation. The build pipeline automatically transforms `package.json` for
-publishing — the source file stays `"private": true` and the builder handles the
-rest.
+## Development
 
-See the [Changesets documentation](https://github.com/changesets/changesets) for
-how versioning and releases work.
+```bash
+pnpm install
+pnpm run test              # Run tests
+pnpm run test:watch        # Watch mode
+pnpm run test:coverage     # With v8 coverage
+pnpm run build             # Build dev + prod outputs
+pnpm run lint              # Biome lint + format check
+pnpm run typecheck         # Type-check via tsgo
+```
 
-## Claude Code
+## Contributing
 
-This template includes configuration for
-[Claude Code](https://docs.anthropic.com/en/docs/claude-code). See
-[CLAUDE.md](CLAUDE.md) for details on the design-first development workflow.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions and workflow.
 
 ## License
 

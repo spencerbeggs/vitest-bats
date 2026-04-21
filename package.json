@@ -1,15 +1,16 @@
 {
-	"name": "@spencerbeggs/pnpm-module-template",
+	"name": "@spencerbeggs/vitest-bats",
 	"version": "0.0.0",
 	"private": true,
-	"description": "A template repository for developing and deploying Node.js modules from a pnpm monorepo structure.",
-	"homepage": "https://github.com/spencerbeggs/pnpm-module-template#readme",
+	"description": "Test bash scripts with kcov coverage directly in Vitest",
+	"keywords": ["vitest", "bats", "bash", "shell", "testing", "kcov", "coverage"],
+	"homepage": "https://github.com/spencerbeggs/vitest-bats#readme",
 	"bugs": {
-		"url": "https://github.com/spencerbeggs/pnpm-module-template/issues"
+		"url": "https://github.com/spencerbeggs/vitest-bats/issues"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/spencerbeggs/pnpm-module-template.git"
+		"url": "git+https://github.com/spencerbeggs/vitest-bats.git"
 	},
 	"license": "MIT",
 	"author": {
@@ -47,8 +48,9 @@
 		"@savvy-web/changesets": "^0.8.0",
 		"@savvy-web/commitlint": "^0.6.0",
 		"@savvy-web/lint-staged": "^0.8.0",
-		"@savvy-web/rslib-builder": "^0.20.1",
-		"@savvy-web/vitest": "^1.3.0"
+		"@savvy-web/vitest": "^1.3.0",
+		"vitest": "^4.1.5",
+		"vitest-bats": "workspace:*"
 	},
 	"packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319",
 	"devEngines": {
@@ -62,27 +64,6 @@
 				"name": "node",
 				"version": "24.11.0",
 				"onFail": "ignore"
-			}
-		]
-	},
-	"publishConfig": {
-		"access": "public",
-		"directory": "dist/dev",
-		"linkDirectory": true,
-		"targets": [
-			{
-				"protocol": "npm",
-				"registry": "https://npm.pkg.github.com/",
-				"directory": "dist/npm",
-				"access": "public",
-				"provenance": true
-			},
-			{
-				"protocol": "npm",
-				"registry": "https://registry.npmjs.org/",
-				"directory": "dist/npm",
-				"access": "public",
-				"provenance": true
 			}
 		]
 	}
