@@ -1,0 +1,81 @@
+{
+	"name": "pnpm Module Template",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"args": {
+			"TZ": "${localEnv:TZ:America/New_York}",
+			"CLAUDE_CODE_VERSION": "latest",
+			"GIT_DELTA_VERSION": "0.18.2",
+			"ZSH_IN_DOCKER_VERSION": "1.2.0",
+			"PNPM_VERSION": "10.33.0"
+		}
+	},
+	"runArgs": ["--cap-add=NET_ADMIN", "--cap-add=NET_RAW"],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"anthropic.claude-code",
+				"bierner.markdown-footnotes",
+				"bierner.markdown-preview-github-styles",
+				"bierner.markdown-yaml-preamble",
+				"biomejs.biome",
+				"davidanson.vscode-markdownlint",
+				"eamodio.gitlens",
+				"github.copilot-chat",
+				"github.vscode-github-actions",
+				"github.vscode-pull-request-github",
+				"mikestead.dotenv",
+				"ms-vscode.live-server",
+				"ms-vscode.vscode-speech",
+				"ms-vscode.vscode-typescript-next",
+				"redhat.vscode-yaml",
+				"tombi-toml.tombi",
+				"tombonnike.vscode-status-bar-format-toggle",
+				"typescriptteam.native-preview",
+				"unifiedjs.vscode-mdx",
+				"vercel.turbo-vsc",
+				"vitest.explorer",
+				"vscode.vscode-typescript-next",
+				"yoavbls.pretty-ts-errors"
+			],
+			"settings": {
+				"editor.formatOnSave": true,
+				"editor.defaultFormatter": "biomejs.biome",
+				"editor.codeActionsOnSave": {
+					"source.fixAll.biome": "explicit",
+					"source.fixAll.markdownlint": "explicit",
+					"source.organizeImports.biome": "explicit"
+				},
+				"biome.enabled": true,
+				"biome.requireConfiguration": true,
+				"eslint.enable": false,
+				"prettier.enable": false,
+				"terminal.integrated.defaultProfile.linux": "zsh",
+				"terminal.integrated.profiles.linux": {
+					"bash": {
+						"path": "bash",
+						"icon": "terminal-bash"
+					},
+					"zsh": {
+						"path": "zsh"
+					}
+				}
+			}
+		}
+	},
+	"remoteUser": "node",
+	"mounts": [
+		"source=claude-code-bashhistory-${devcontainerId},target=/commandhistory,type=volume",
+		"source=claude-code-config-${devcontainerId},target=/home/node/.claude,type=volume"
+	],
+	"containerEnv": {
+		"NODE_OPTIONS": "--max-old-space-size=4096",
+		"CLAUDE_CONFIG_DIR": "/home/node/.claude",
+		"POWERLEVEL9K_DISABLE_GITSTATUS": "true"
+	},
+	"workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=delegated",
+	"workspaceFolder": "/workspace",
+	"postCreateCommand": "bash .devcontainer/postCreate.sh",
+	"postStartCommand": "sudo /usr/local/bin/init-firewall.sh",
+	"waitFor": "postStartCommand"
+}
