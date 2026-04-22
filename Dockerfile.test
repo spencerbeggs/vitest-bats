@@ -76,4 +76,4 @@ RUN pnpm install --frozen-lockfile
 RUN find . -name "*.sh" -type f -exec chmod +x {} \;
 
 # Default command: run tests with coverage
-CMD ["pnpm", "test:local"]
+CMD ["pnpm", "test"]

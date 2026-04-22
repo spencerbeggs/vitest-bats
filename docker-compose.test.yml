@@ -25,4 +25,4 @@ services:
       # Format: container_prefix:host_prefix (e.g., /workspace:/Users/spencer/project)
       # This enables VSCode to open files from clickable links generated inside Docker
       - HTE_PATH_REWRITE=${HTE_PATH_REWRITE:-}
-    command: pnpm test:local
+    command: pnpm test

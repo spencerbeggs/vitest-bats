@@ -29,7 +29,7 @@
 		"build:dev": "rslib build --config-loader native --env-mode dev",
 		"build:inspect": "rslib inspect --config-loader native --env-mode npm --verbose",
 		"build:prod": "rslib build --config-loader native --env-mode npm",
-		"prepare": "turbo run build:dev build:prod --log-order=grouped",
+		"prepare": "turbo run build:dev --log-order=grouped",
 		"types:check": "tsgo --noEmit"
 	},
 	"dependencies": {
