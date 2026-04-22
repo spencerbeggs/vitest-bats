@@ -149,9 +149,12 @@ export function generateBatsFile(
 			case "mock": {
 				const mockCmd = cmd.cmd as string;
 				const responses = cmd.responses as Record<string, string>;
-				lines.push(`    stub ${mockCmd}`);
-				for (const [flag, response] of Object.entries(responses)) {
-					lines.push(`    stub ${mockCmd} "${flag}" "${response}"`);
+				const entries = Object.entries(responses);
+				if (entries.length === 0) {
+					lines.push(`    stub ${mockCmd}`);
+				} else {
+					const patterns = entries.map(([flag, response]) => `"${flag} : ${response}"`).join(" ");
+					lines.push(`    stub ${mockCmd} ${patterns}`);
 				}
 				break;
 			}

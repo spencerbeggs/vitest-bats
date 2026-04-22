@@ -95,14 +95,23 @@ describe("generateBatsFile", () => {
 		expect(result).toContain('FOO="bar"');
 	});
 
-	test("generates mock setup", () => {
+	test("generates mock setup with colon-separated pattern", () => {
 		const commands: CommandRecord[] = [
 			{ type: "mock", cmd: "node", responses: { "--version": "v20.0.0" } },
 			{ type: "run", args: ['"$SCRIPT"'] },
 		];
 		const result = generateBatsFile(scriptPath, testName, commands, deps);
-		expect(result).toContain("stub");
-		expect(result).toContain("node");
+		expect(result).toContain('stub node "--version : v20.0.0"');
+	});
+
+	test("generates bare stub for mock with no responses", () => {
+		const commands: CommandRecord[] = [
+			{ type: "mock", cmd: "curl", responses: {} },
+			{ type: "run", args: ['"$SCRIPT"'] },
+		];
+		const result = generateBatsFile(scriptPath, testName, commands, deps);
+		expect(result).toContain("    stub curl");
+		expect(result).not.toContain(":");
 	});
 
 	test("generates run with flags", () => {

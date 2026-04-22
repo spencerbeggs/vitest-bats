@@ -150,7 +150,7 @@ describe("Script Registry", () => {
 	test("findActive() returns the builder with pending commands", () => {
 		resetAll();
 		const a = createBatsScript("/a.sh", "a.sh");
-		const _b = createBatsScript("/b.sh", "b.sh");
+		createBatsScript("/b.sh", "b.sh");
 		a.run('"$SCRIPT"');
 		expect(findActive()).toBe(a);
 	});

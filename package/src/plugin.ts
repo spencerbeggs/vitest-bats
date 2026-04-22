@@ -14,6 +14,14 @@ export interface BatsPluginOptions {
 	 * - false: always exclude .sh from coverage
 	 */
 	coverage?: "auto" | boolean;
+	/**
+	 * How to handle missing system dependencies (bats, kcov, jq, etc.).
+	 * Default: "error"
+	 * - "error": throw on missing required deps, blocking all tests
+	 * - "warn": log warnings but continue; BATS integration tests will
+	 *   fail individually at runtime, pure TS unit tests run normally
+	 */
+	deps?: "error" | "warn";
 	/** Log level for detection output. Default: "errors-only" */
 	logLevel?: LogLevel;
 	/** Hyperlink format for reporter. Default: "auto" */
@@ -147,14 +155,16 @@ function checkDependencies(options: BatsPluginOptions, coverageEnabled: boolean,
 		}
 	}
 
-	// Fail on missing required
-	const missing = deps.filter((d) => d.required && !d.available);
-	if (missing.length > 0) {
-		const lines = missing.map((d) => `  ${d.name}: ${getInstallCommand(d.name, onMacOS)}`);
-		throw new Error(`[vitest-bats] Missing required dependencies:\n${lines.join("\n")}`);
-	}
-
 	return deps;
+}
+
+function getMissingDeps(deps: Dependency[]): Dependency[] {
+	return deps.filter((d) => d.required && !d.available);
+}
+
+function formatMissingDeps(missing: Dependency[], onMacOS: boolean): string {
+	const lines = missing.map((d) => `  ${d.name}: ${getInstallCommand(d.name, onMacOS)}`);
+	return `[vitest-bats] Missing required dependencies:\n${lines.join("\n")}`;
 }
 
 const VIRTUAL_PREFIX = "\0bats:";
@@ -229,7 +239,21 @@ export function BatsPlugin(options: BatsPluginOptions = {}): Plugin {
 
 			// Check dependencies and set env vars
 			const onMacOS = osType() === "Darwin";
+			const depsMode = options.deps ?? "error";
 			const deps = checkDependencies(options, coverageEnabled, onMacOS);
+
+			const missing = getMissingDeps(deps);
+			if (missing.length > 0) {
+				const msg = formatMissingDeps(missing, onMacOS);
+				if (depsMode === "error") {
+					throw new Error(msg);
+				}
+				console.warn(`\n  ${msg}`);
+				console.warn(
+					"  [vitest-bats] Running in degraded mode (deps: 'warn')." +
+						" BATS integration tests will fail individually.\n",
+				);
+			}
 
 			// Determine shell script coverage mode
 			const coverageMode = options.coverage ?? "auto";

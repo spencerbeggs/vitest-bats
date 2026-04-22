@@ -2,7 +2,7 @@ import { defineConfig } from "vitest/config";
 import { BatsPlugin } from "vitest-bats";
 
 export default defineConfig({
-	plugins: [BatsPlugin()],
+	plugins: [BatsPlugin({ deps: "warn" })],
 	test: {
 		include: ["__test__/**/*.test.ts", "package/__test__/**/*.test.ts"],
 		globalSetup: ["vitest.setup.ts"],
