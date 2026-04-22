@@ -1,12 +1,13 @@
-FROM node:22
+FROM node:24-bookworm
 
 ARG TZ
 ENV TZ="$TZ"
 
 ARG CLAUDE_CODE_VERSION=latest
 ARG PNPM_VERSION=10.33.0
+ARG BIOME_VERSION=2.4.9
 
-# Install development tools and firewall dependencies
+# Install development tools, firewall dependencies, and kcov build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
   less \
   git \
@@ -26,7 +27,69 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   jq \
   nano \
   vim \
-  && apt-get clean && rm -rf /var/lib/apt/lists/*
+  bash \
+  curl \
+  wget \
+  binutils \
+  libdw-dev \
+  libiberty-dev \
+  libcurl4-openssl-dev \
+  zlib1g-dev \
+  python3 \
+  cmake \
+  pkg-config \
+  locales \
+  build-essential \
+  file \
+  && apt-get clean && rm -rf /var/lib/apt/lists/* \
+  && ln -sf /bin/bash /bin/sh \
+  && sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
+
+ENV LANG=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
+
+# Install kcov from source (required for bash coverage collection)
+RUN cd /tmp && \
+  git clone --depth 1 https://github.com/SimonKagstrom/kcov.git && \
+  cd kcov && \
+  mkdir build && \
+  cd build && \
+  cmake .. && \
+  make && \
+  make install && \
+  cd / && \
+  rm -rf /tmp/kcov
+
+# Install BATS (Bash Automated Testing System)
+RUN cd /tmp && \
+  git clone --depth 1 https://github.com/bats-core/bats-core.git && \
+  cd bats-core && \
+  ./install.sh /usr/local && \
+  cd / && \
+  rm -rf /tmp/bats-core
+
+# Install bats-support library
+RUN mkdir -p /usr/local/lib && \
+  cd /tmp && \
+  git clone --depth 1 https://github.com/bats-core/bats-support.git && \
+  cp -r bats-support /usr/local/lib/ && \
+  rm -rf /tmp/bats-support
+
+# Install bats-assert library
+RUN mkdir -p /usr/local/lib && \
+  cd /tmp && \
+  git clone --depth 1 https://github.com/bats-core/bats-assert.git && \
+  cp -r bats-assert /usr/local/lib/ && \
+  rm -rf /tmp/bats-assert
+
+# Install bats-mock for command mocking
+RUN mkdir -p /usr/local/lib/bats-mock && \
+  cd /tmp && \
+  git clone --depth 1 https://github.com/jasonkarns/bats-mock.git && \
+  cp bats-mock/stub.bash bats-mock/binstub /usr/local/lib/bats-mock/ && \
+  chmod +x /usr/local/lib/bats-mock/binstub && \
+  echo 'source "$(dirname "${BASH_SOURCE[0]}")/stub.bash"' > /usr/local/lib/bats-mock/load.bash && \
+  rm -rf /tmp/bats-mock
 
 # Ensure default node user has access to /usr/local/share
 RUN mkdir -p /usr/local/share/npm-global && \
@@ -41,12 +104,17 @@ RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhisto
   && chown -R $USERNAME /commandhistory
 
 ENV DEVCONTAINER=true
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 
-# Create workspace and config directories
-RUN mkdir -p /workspace /home/node/.claude && \
-  chown -R node:node /workspace /home/node/.claude
+# Create config, pnpm store, and vscode-server directories
+RUN mkdir -p /home/node/.claude /home/node/.local/share/pnpm /home/node/.vscode-server && \
+  chown -R node:node /home/node/.claude /home/node/.local/share/pnpm /home/node/.vscode-server
 
-WORKDIR /workspace
+# Pre-create node_modules directories owned by node so volume mounts inherit correct permissions
+RUN mkdir -p /workspaces/vitest-bats/node_modules /workspaces/vitest-bats/package/node_modules && \
+  chown -R node:node /workspaces/vitest-bats
+
+WORKDIR /workspaces
 
 # Install git-delta for better diffs
 ARG GIT_DELTA_VERSION=0.18.2
@@ -77,8 +145,28 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
   -a "export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" \
   -x
 
-# Install Claude Code and Biome
-RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION} @biomejs/biome
+# Install Homebrew: create target dir as root, install as node user
+USER root
+RUN mkdir -p /home/linuxbrew && chown -R node:node /home/linuxbrew
+USER node
+RUN NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+ENV PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH"
+
+# Install Claude Code via Homebrew
+RUN brew install claude-code
+
+# Install Biome binary (pinned version for LSP support)
+USER root
+RUN ARCH=$(dpkg --print-architecture) && \
+  case "$ARCH" in \
+    amd64) BIOME_ARCH="linux-x64" ;; \
+    arm64) BIOME_ARCH="linux-arm64" ;; \
+    *) echo "Unsupported architecture: $ARCH" && exit 1 ;; \
+  esac && \
+  curl -fsSL "https://github.com/biomejs/biome/releases/download/%40biomejs%2Fbiome%40${BIOME_VERSION}/biome-${BIOME_ARCH}" -o /usr/local/bin/biome && \
+  chmod +x /usr/local/bin/biome
+USER node
 
 # Copy and set up firewall script
 COPY init-firewall.sh /usr/local/bin/
@@ -87,3 +175,5 @@ RUN chmod +x /usr/local/bin/init-firewall.sh && \
   echo "node ALL=(root) NOPASSWD: /usr/local/bin/init-firewall.sh" > /etc/sudoers.d/node-firewall && \
   chmod 0440 /etc/sudoers.d/node-firewall
 USER node
+
+CMD ["sleep", "infinity"]

@@ -4,19 +4,30 @@ Contributions are welcome. This guide covers setup, workflow, and conventions.
 
 ## Prerequisites
 
+### Option A: Dev Container (Recommended)
+
+Open the repository in VS Code with the
+[Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+or in [GitHub Codespaces](https://github.com/codespaces). The
+`.devcontainer/` configuration installs Node.js, pnpm, bats, kcov, and all
+BATS libraries automatically -- no manual setup required. Coverage collection
+works out of the box.
+
+### Option B: Local Install
+
 - **Node.js** 24+
 - **pnpm** 10.33+
 - **System tools**: bats, bats-support, bats-assert, bats-mock, jq
 - **Optional**: kcov (Linux only -- coverage collection), Docker (macOS
   coverage)
 
-### macOS
+#### macOS
 
 ```bash
 brew install bats-core bats-support bats-assert bats-mock jq kcov
 ```
 
-### Linux (Debian/Ubuntu)
+#### Linux (Debian/Ubuntu)
 
 ```bash
 apt-get install -y bats bats-support bats-assert bats-file jq kcov
@@ -39,6 +50,7 @@ package/              Published npm package (vitest-bats)
   __test__/           Package unit tests
 scripts/              Example shell scripts for testing
 __test__/             Integration tests consuming the package
+.devcontainer/        Dev container for VS Code / Codespaces
 Dockerfile.test       Docker environment for kcov on macOS
 docker-compose.test.yml
 ```
@@ -97,8 +109,8 @@ Tests live in `__test__/`, never co-located in `src/`. See
 - Integration tests: `__test__/integration/*.int.test.ts`
 
 Coverage collection requires kcov on Linux. On macOS, tests run but kcov
-coverage is not collected. Use Docker for macOS coverage -- see
-[docs/docker-coverage.md](docs/docker-coverage.md).
+coverage is not collected. Use the [dev container](.devcontainer/) or Docker
+for macOS coverage -- see [docs/docker-coverage.md](docs/docker-coverage.md).
 
 ## Commits
 

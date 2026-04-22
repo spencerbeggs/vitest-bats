@@ -2,6 +2,14 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+# Skip firewall in Codespaces — VS Code Server needs outbound access to the
+# Codespaces relay infrastructure which can't be reliably whitelisted.
+# Codespaces provides its own network security boundary.
+if [ "${CODESPACES:-}" = "true" ]; then
+    echo "Codespaces detected, skipping firewall configuration"
+    exit 0
+fi
+
 # Extract Docker DNS info BEFORE flushing
 DOCKER_DNS_RULES=$(iptables-save -t nat | grep "127\.0\.0\.11" || true)
 
@@ -24,12 +32,9 @@ else
     echo "No Docker DNS rules to restore"
 fi
 
-# Allow DNS and localhost before restrictions
+# Allow DNS, SSH, and localhost outbound before restrictions
 iptables -A OUTPUT -p udp --dport 53 -j ACCEPT
-iptables -A INPUT -p udp --sport 53 -j ACCEPT
 iptables -A OUTPUT -p tcp --dport 22 -j ACCEPT
-iptables -A INPUT -p tcp --sport 22 -m state --state ESTABLISHED -j ACCEPT
-iptables -A INPUT -i lo -j ACCEPT
 iptables -A OUTPUT -o lo -j ACCEPT
 
 # Create ipset with CIDR support
@@ -55,7 +60,7 @@ while read -r cidr; do
         exit 1
     fi
     echo "Adding GitHub range $cidr"
-    ipset add allowed-domains "$cidr"
+    ipset add allowed-domains "$cidr" -exist
 done < <(echo "$gh_ranges" | jq -r '(.web + .api + .git)[]' | aggregate -q)
 
 # Resolve and add allowed domains
@@ -70,10 +75,10 @@ for domain in \
     "vscode.blob.core.windows.net" \
     "update.code.visualstudio.com"; do
     echo "Resolving $domain..."
-    ips=$(dig +noall +answer A "$domain" | awk '$4 == "A" {print $5}')
+    ips=$(dig +noall +answer +recurse "$domain" | awk '$4 == "A" {print $5}')
     if [ -z "$ips" ]; then
-        echo "ERROR: Failed to resolve $domain"
-        exit 1
+        echo "WARNING: Failed to resolve $domain, skipping"
+        continue
     fi
 
     while read -r ip; do
@@ -82,7 +87,7 @@ for domain in \
             exit 1
         fi
         echo "Adding $ip for $domain"
-        ipset add allowed-domains "$ip"
+        ipset add allowed-domains "$ip" -exist
     done < <(echo "$ips")
 done
 
@@ -96,16 +101,16 @@ fi
 HOST_NETWORK=$(echo "$HOST_IP" | sed "s/\.[0-9]*$/.0\/24/")
 echo "Host network detected as: $HOST_NETWORK"
 
-iptables -A INPUT -s "$HOST_NETWORK" -j ACCEPT
 iptables -A OUTPUT -d "$HOST_NETWORK" -j ACCEPT
 
-# Default-deny policy
-iptables -P INPUT DROP
+# Default policies: restrict outbound, allow inbound
+# INPUT ACCEPT: container host (Codespaces agent, Docker) must connect to VS Code Server
+# OUTPUT DROP: restrict AI agent outbound internet access (the security goal)
+iptables -P INPUT ACCEPT
 iptables -P FORWARD DROP
 iptables -P OUTPUT DROP
 
-# Allow established connections
-iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+# Allow established outbound connections
 iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 
 # Allow outbound to whitelisted domains only
