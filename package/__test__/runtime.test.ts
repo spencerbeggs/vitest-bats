@@ -71,9 +71,7 @@ describe("ScriptBuilder", () => {
 	test("assert_line() with string records line assertion", () => {
 		const script = createBatsScript("/path/to/line.sh", "line.sh");
 		script.assert_line("expected line");
-		expect(script.commands).toEqual([
-			{ type: "assert_line", opts: { index: undefined, line: "expected line" }, expected: undefined },
-		]);
+		expect(script.commands).toEqual([{ type: "assert_line", opts: {}, expected: "expected line" }]);
 	});
 
 	test("assert_line() with object records indexed/partial assertion", () => {
@@ -87,9 +85,7 @@ describe("ScriptBuilder", () => {
 	test("assert_line() with string and expected records both", () => {
 		const script = createBatsScript("/path/to/line3.sh", "line3.sh");
 		script.assert_line("label", "value");
-		expect(script.commands).toEqual([
-			{ type: "assert_line", opts: { index: undefined, line: "label" }, expected: "value" },
-		]);
+		expect(script.commands).toEqual([{ type: "assert_line", opts: {}, expected: "value" }]);
 	});
 
 	test("assert_json_value() records JSON assertion", () => {

@@ -82,8 +82,7 @@ function getInstallCommand(name: string, onMacOS: boolean): string {
 	return cmd ? (onMacOS ? cmd.mac : cmd.linux) : "See documentation";
 }
 
-function checkDependencies(options: BatsPluginOptions, coverageEnabled: boolean): Dependency[] {
-	const onMacOS = osType() === "Darwin";
+function checkDependencies(options: BatsPluginOptions, coverageEnabled: boolean, onMacOS: boolean): Dependency[] {
 	const logLevel = options.logLevel ?? "errors-only";
 	const deps: Dependency[] = [];
 
@@ -161,12 +160,12 @@ function checkDependencies(options: BatsPluginOptions, coverageEnabled: boolean)
 const VIRTUAL_PREFIX = "\0bats:";
 
 export function BatsPlugin(options: BatsPluginOptions = {}): Plugin {
-	const registeredScripts: string[] = [];
+	const registeredScripts = new Set<string>();
 	let cacheDir: string | null = null;
 
 	function writeManifest(): void {
 		if (!cacheDir) return;
-		writeFileSync(resolve(cacheDir, "scripts.json"), JSON.stringify(registeredScripts, null, "\t"), "utf-8");
+		writeFileSync(resolve(cacheDir, "scripts.json"), JSON.stringify([...registeredScripts], null, "\t"), "utf-8");
 	}
 
 	return {
@@ -201,8 +200,8 @@ export function BatsPlugin(options: BatsPluginOptions = {}): Plugin {
 			const scriptPath = id.slice(VIRTUAL_PREFIX.length);
 			const scriptName = basename(scriptPath);
 
-			if (!registeredScripts.includes(scriptPath)) {
-				registeredScripts.push(scriptPath);
+			if (!registeredScripts.has(scriptPath)) {
+				registeredScripts.add(scriptPath);
 				writeManifest();
 			}
 
@@ -229,14 +228,12 @@ export function BatsPlugin(options: BatsPluginOptions = {}): Plugin {
 			const coverageEnabled = coverageCfg?.enabled === true;
 
 			// Check dependencies and set env vars
-			const deps = checkDependencies(options, coverageEnabled);
+			const onMacOS = osType() === "Darwin";
+			const deps = checkDependencies(options, coverageEnabled, onMacOS);
 
 			// Determine shell script coverage mode
 			const coverageMode = options.coverage ?? "auto";
 			const kcovAvailable = deps.some((d) => d.name === "kcov" && d.available);
-
-			// kcov is unreliable on macOS due to SIP blocking ptrace
-			const onMacOS = osType() === "Darwin";
 			const kcovReliable = kcovAvailable && !onMacOS;
 
 			let includeShCoverage = false;

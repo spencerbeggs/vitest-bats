@@ -1,5 +1,5 @@
 import { execSync } from "node:child_process";
-import { chmodSync, mkdirSync, statSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join, resolve } from "node:path";
 import { TestRunner } from "vitest";
@@ -12,12 +12,20 @@ export default class BatsRunner extends TestRunner {
 	private deps: BatsDeps;
 	private kcov: KcovConfig | undefined;
 	private kcovCacheDir: string | null;
+	private executableScripts = new Set<string>();
 
 	constructor(config: ConstructorParameters<typeof TestRunner>[0]) {
 		super(config);
 
 		this.tempDir = join(tmpdir(), `vitest-bats-${process.pid}`);
 		mkdirSync(this.tempDir, { recursive: true });
+		process.on("exit", () => {
+			try {
+				rmSync(this.tempDir, { recursive: true, force: true });
+			} catch {
+				// Best-effort cleanup
+			}
+		});
 
 		this.deps = {
 			batsPath: process.env.BATS_PATH ?? "bats",
@@ -47,29 +55,34 @@ export default class BatsRunner extends TestRunner {
 			const commands = [...active.commands];
 			active.reset();
 
+			const ts = Date.now();
+
 			// Build per-test kcov config with unique output dir
 			let kcovForTest: KcovConfig | undefined;
 			if (this.kcov && this.kcovCacheDir) {
 				const scriptName = basename(active.path, ".sh");
-				const testId = `${scriptName}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+				const testId = `${scriptName}-${ts}-${Math.random().toString(36).slice(2)}`;
 				const outputDir = resolve(this.kcovCacheDir, "kcov", testId);
 				mkdirSync(outputDir, { recursive: true });
 				kcovForTest = { kcovPath: this.kcov.kcovPath, outputDir };
 			}
 
-			// Ensure the script is executable
-			const scriptStat = statSync(active.path);
-			if (!(scriptStat.mode & 0o111)) {
-				chmodSync(active.path, scriptStat.mode | 0o755);
+			// Ensure the script is executable (cached per path)
+			if (!this.executableScripts.has(active.path)) {
+				const scriptStat = statSync(active.path);
+				if (!(scriptStat.mode & 0o111)) {
+					chmodSync(active.path, scriptStat.mode | 0o755);
+				}
+				this.executableScripts.add(active.path);
 			}
 
 			const batsContent = generateBatsFile(active.path, test.name, commands, this.deps, kcovForTest);
 
-			const batsFile = resolve(this.tempDir, `${Date.now()}-${Math.random().toString(36).slice(2)}.bats`);
+			const batsFile = resolve(this.tempDir, `${ts}-${Math.random().toString(36).slice(2)}.bats`);
 			writeFileSync(batsFile, batsContent, { mode: 0o755 });
 
 			try {
-				execSync(`bats --tap "${batsFile}"`, {
+				execSync(`"${this.deps.batsPath}" --tap "${batsFile}"`, {
 					encoding: "utf-8",
 					stdio: ["pipe", "pipe", "pipe"],
 					timeout: 60000,

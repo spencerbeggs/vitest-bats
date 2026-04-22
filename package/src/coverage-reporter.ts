@@ -1,5 +1,5 @@
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
-import { resolve } from "node:path";
+import { basename, resolve } from "node:path";
 import { XMLParser } from "fast-xml-parser";
 
 interface IstanbulLocation {
@@ -7,12 +7,11 @@ interface IstanbulLocation {
 	end: { line: number; column: number };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Istanbul maps use varying shapes
 interface IstanbulFileCoverage {
 	path: string;
 	statementMap: Record<string, IstanbulLocation>;
-	fnMap: Record<string, any>;
-	branchMap: Record<string, any>;
+	fnMap: Record<string, unknown>;
+	branchMap: Record<string, unknown>;
 	s: Record<string, number>;
 	f: Record<string, number>;
 	b: Record<string, number[]>;
@@ -34,6 +33,7 @@ export class BatsCoverageReporter {
 	private cacheDir: string;
 	private thresholds: CoverageThresholds | false;
 	private statementPassThrough: boolean;
+	private readonly xmlParser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_" });
 
 	constructor(cacheDir: string, options: { thresholds?: CoverageThresholds; statementPassThrough?: boolean } = {}) {
 		this.cacheDir = cacheDir;
@@ -61,7 +61,7 @@ export class BatsCoverageReporter {
 
 		const kcovCoverage = this.collectKcovCoverage();
 
-		let usedPassThrough = false;
+		const passThroughScripts: string[] = [];
 		for (const scriptPath of scripts) {
 			const kcovEntry = kcovCoverage.get(scriptPath);
 			if (kcovEntry) {
@@ -79,7 +79,7 @@ export class BatsCoverageReporter {
 				const fc = this.buildSyntheticCoverageEntry(scriptPath);
 				if (fc) {
 					coverageMap.addFileCoverage(fc);
-					usedPassThrough = true;
+					passThroughScripts.push(scriptPath);
 				}
 			} else {
 				const fc = this.buildZeroCoverageEntry(scriptPath);
@@ -89,8 +89,8 @@ export class BatsCoverageReporter {
 			}
 		}
 
-		if (usedPassThrough && this.thresholds) {
-			const scriptNames = scripts.map((s) => s.split("/").pop()).join(", ");
+		if (passThroughScripts.length > 0 && this.thresholds) {
+			const scriptNames = passThroughScripts.map((s) => basename(s)).join(", ");
 			const { statements, branches, functions, lines } = this.thresholds;
 			const thresholdDesc =
 				statements === branches && branches === functions && functions === lines
@@ -187,8 +187,6 @@ export class BatsCoverageReporter {
 	}
 
 	private buildZeroCoverageEntry(scriptPath: string): IstanbulFileCoverage | null {
-		if (!existsSync(scriptPath)) return null;
-
 		let content: string;
 		try {
 			content = readFileSync(scriptPath, "utf-8");
@@ -302,11 +300,7 @@ export class BatsCoverageReporter {
 
 		try {
 			const xmlContent = readFileSync(coberturaPath, "utf-8");
-			const parser = new XMLParser({
-				ignoreAttributes: false,
-				attributeNamePrefix: "@_",
-			});
-			const parsed = parser.parse(xmlContent);
+			const parsed = this.xmlParser.parse(xmlContent);
 
 			const sources = parsed?.coverage?.sources?.source;
 			const sourcePath: string = Array.isArray(sources) ? sources[0] : (sources ?? "");

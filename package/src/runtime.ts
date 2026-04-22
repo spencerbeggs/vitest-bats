@@ -73,8 +73,8 @@ export class ScriptBuilder {
 	assert_line(opts: { partial?: string; regexp?: string; index?: number } | string, expected?: string): this {
 		this.commands.push({
 			type: "assert_line",
-			opts: typeof opts === "string" ? { index: undefined, line: opts } : opts,
-			expected,
+			opts: typeof opts === "string" ? {} : opts,
+			expected: typeof opts === "string" ? (expected ?? opts) : expected,
 		});
 		return this;
 	}
