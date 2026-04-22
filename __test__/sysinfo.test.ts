@@ -1,45 +1,44 @@
 import os from "node:os";
-import { BatsHelper } from "vitest-bats";
+import { describe, test } from "vitest";
+import sysinfo from "../scripts/sysinfo.sh";
 
-const scriptPath = import.meta.resolve("../scripts/sysinfo.sh");
-
-BatsHelper.describe(scriptPath, (helper) => {
-	helper.test("script exists and is executable", (script) => {
-		script.raw('[ -f "$SCRIPT" ]');
-		script.raw('[ -x "$SCRIPT" ]');
+describe("sysinfo.sh", () => {
+	test("script exists and is executable", () => {
+		sysinfo.raw('[ -f "$SCRIPT" ]');
+		sysinfo.raw('[ -x "$SCRIPT" ]');
 	});
 
-	helper.test("outputs valid JSON by default", (script) => {
-		script.run('"$SCRIPT"');
-		script.assert_success();
-		script.assert_output({ partial: '"hostname"' });
-		script.assert_output({ partial: '"os_type"' });
-		script.assert_output({ partial: '"date"' });
+	test("outputs valid JSON by default", () => {
+		sysinfo.run('"$SCRIPT"');
+		sysinfo.assert_success();
+		sysinfo.assert_output({ partial: '"hostname"' });
+		sysinfo.assert_output({ partial: '"os_type"' });
+		sysinfo.assert_output({ partial: '"date"' });
 	});
 
-	helper.test("detects OS type", (script) => {
-		script.run('"$SCRIPT"');
-		script.assert_success();
-		script.assert_json_value("os_type", os.type());
+	test("detects OS type", () => {
+		sysinfo.run('"$SCRIPT"');
+		sysinfo.assert_success();
+		sysinfo.assert_json_value("os_type", os.type());
 	});
 
-	helper.test("outputs pretty format with --pretty flag", (script) => {
-		script.run('"$SCRIPT" --pretty');
-		script.assert_success();
-		script.assert_output({ partial: "System Information" });
-		script.assert_output({ partial: "Hostname:" });
-		script.assert_output({ partial: "OS Type:" });
+	test("outputs pretty format with --pretty flag", () => {
+		sysinfo.run('"$SCRIPT" --pretty');
+		sysinfo.assert_success();
+		sysinfo.assert_output({ partial: "System Information" });
+		sysinfo.assert_output({ partial: "Hostname:" });
+		sysinfo.assert_output({ partial: "OS Type:" });
 	});
 
-	helper.test("rejects unknown arguments", (script) => {
-		script.run('"$SCRIPT" --invalid');
-		script.assert_failure();
-		script.assert_output({ partial: "Unknown option" });
+	test("rejects unknown arguments", () => {
+		sysinfo.run('"$SCRIPT" --invalid');
+		sysinfo.assert_failure();
+		sysinfo.assert_output({ partial: "Unknown option" });
 	});
 
-	helper.test("displays help with --help flag", (script) => {
-		script.run('"$SCRIPT" --help');
-		script.assert_success();
-		script.assert_output({ partial: "Usage:" });
+	test("displays help with --help flag", () => {
+		sysinfo.run('"$SCRIPT" --help');
+		sysinfo.assert_success();
+		sysinfo.assert_output({ partial: "Usage:" });
 	});
 });

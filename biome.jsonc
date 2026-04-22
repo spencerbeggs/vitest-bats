@@ -1,4 +1,16 @@
 {
 	"$schema": "https://biomejs.dev/schemas/2.4.9/schema.json",
-	"extends": ["@savvy-web/lint-staged/biome/silk.jsonc"]
+	"extends": ["@savvy-web/lint-staged/biome/silk.jsonc"],
+	"overrides": [
+		{
+			"includes": ["__test__/hello.test.ts", "__test__/sysinfo.test.ts"],
+			"linter": {
+				"rules": {
+					"correctness": {
+						"useImportExtensions": "off"
+					}
+				}
+			}
+		}
+	]
 }

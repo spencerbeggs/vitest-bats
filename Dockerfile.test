@@ -60,20 +60,17 @@ RUN mkdir -p /usr/local/lib/bats-mock && \
     echo 'source "$(dirname "${BASH_SOURCE[0]}")/stub.bash"' > /usr/local/lib/bats-mock/load.bash && \
     rm -rf /tmp/bats-mock
 
-# Install pnpm
-RUN npm install -g pnpm@10.20.0
+# Install pnpm (match version from packageManager field)
+RUN npm install -g pnpm@10.33.0
 
 # Set working directory
 WORKDIR /workspace
 
-# Copy package files
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-
-# Install dependencies
-RUN pnpm install --frozen-lockfile
-
-# Copy the rest of the project
+# Copy entire project (source needed for package prepare script)
 COPY . .
+
+# Install dependencies (triggers package prepare which builds via turbo)
+RUN pnpm install --frozen-lockfile
 
 # Make shell scripts executable
 RUN find . -name "*.sh" -type f -exec chmod +x {} \;

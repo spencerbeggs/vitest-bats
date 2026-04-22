@@ -1,0 +1,11 @@
+node_modules
+**/dist
+**/.turbo
+**/.rslib
+**/.vitest
+**/.coverage
+coverage
+.vitest-bats-cache
+.git
+.claude
+docs/superpowers

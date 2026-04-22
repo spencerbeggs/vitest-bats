@@ -22,7 +22,8 @@
 	"type": "module",
 	"exports": {
 		".": "./src/index.ts",
-		"./provider": "./src/provider.ts"
+		"./runner": "./src/runner.ts",
+		"./runtime": "./src/runtime.ts"
 	},
 	"scripts": {
 		"build:dev": "rslib build --config-loader native --env-mode dev",
@@ -40,10 +41,11 @@
 		"@types/node": "catalog:silk",
 		"@typescript/native-preview": "catalog:silk",
 		"tsx": "catalog:silk",
-		"typescript": "catalog:silk"
+		"typescript": "catalog:silk",
+		"vite": "^8.0.9"
 	},
 	"peerDependencies": {
-		"vitest": ">=3.0.0"
+		"vitest": ">=4.1.0"
 	},
 	"peerDependenciesMeta": {
 		"vitest": {

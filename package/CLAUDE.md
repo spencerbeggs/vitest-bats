@@ -5,25 +5,23 @@ via BATS with kcov coverage collection.
 
 ## Package Overview
 
-Published as `vitest-bats` to npm and GitHub Packages. Two entry points:
+Published as `vitest-bats` to npm and GitHub Packages. Three entry points:
 
-- `vitest-bats` (`src/index.ts`) -- Main entry: BatsPlugin, BatsHelper, reporters, types
-- `vitest-bats/provider` (`src/provider.ts`) -- Custom coverage provider module
+- `vitest-bats` (`src/index.ts`) -- Main entry: BatsPlugin, ScriptBuilder, reporters, types
+- `vitest-bats/runner` (`src/runner.ts`) -- Custom test runner (auto-injected by plugin)
+- `vitest-bats/runtime` (`src/runtime.ts`) -- Runtime API: ScriptBuilder, registry
 
 ## Source Layout
 
 ```text
 src/
   index.ts                          # Public API re-exports
-  provider.ts                       # Secondary entry (vitest-bats/provider)
-  plugin.ts                         # BatsPlugin() -- primary Vitest integration
+  plugin.ts                         # BatsPlugin() -- Vite transform + runner setup
+  runner.ts                         # Custom test runner (auto-injected by plugin)
+  runtime.ts                        # ScriptBuilder + registry (test-writing API)
+  bats-generator.ts                 # Generates .bats file content from test definitions
   coverage-reporter.ts              # BatsCoverageReporter (CoverageMap merge)
-  vitest-kcov-bats-helper.ts        # BatsHelper test-writing API
-  vitest-kcov-provider.ts           # Custom kcov coverage provider
-  vitest-kcov-reporter-coverage.ts  # Istanbul-style terminal coverage table
-  vitest-kcov-reporter-verbose.ts   # Enhanced test reporter with OSC 8 links
-  hte-link.ts                       # Terminal hyperlink utility
-  platform-utils.ts                 # OS detection helpers
+  shims.d.ts                        # Module declarations for virtual imports
   vitest-kcov-types.ts              # Type augmentation for vitest/node
 ```
 
@@ -35,35 +33,45 @@ Vitest plugin added to `plugins` array. Handles:
 
 1. System dependency detection (bats, kcov, jq, bats-mock, bats-support,
    bats-assert)
-2. Environment variable export for BatsHelper
-3. Cache directory creation (`.vitest-bats-cache/`)
-4. Reporter injection (BatsCoverageReporter + KcovVerboseReporter)
+2. Vite transform: resolves `.sh` imports into ScriptBuilder instances
+   (with `fromTransform: true` for runner scoping)
+3. Auto-injects custom BatsRunner via `config` hook -- errors if user sets
+   a conflicting `runner` manually
+4. Cache directory creation (scoped under Vite's cacheDir as `vitest-bats/`)
+5. Coverage reporter injection: always injects `BatsCoverageReporter` when
+   coverage is enabled, with synthetic branch/function entries
 
-### BatsHelper.describe (vitest-kcov-bats-helper.ts)
+### ScriptBuilder (runtime.ts)
 
-Test-writing API. Wraps `vitest.describe()` with BATS lifecycle:
+Test-writing API. Import `.sh` files in standard `.test.ts` files:
 
 ```typescript
-import { BatsHelper } from "vitest-bats";
+import hello from "../scripts/hello.sh";
 
-BatsHelper.describe(import.meta.resolve("../scripts/my-script.sh"), (helper) => {
-  helper.test("outputs greeting", (script) => {
-    script.run('"$SCRIPT"');
-    script.assert_success();
-    script.assert_output({ partial: "Hello" });
-  });
+test("outputs greeting", () => {
+  hello.run('"$SCRIPT"');
+  hello.assert_success();
+  hello.assert_output({ partial: "Hello" });
 });
 ```
 
-Key test context methods: `run()`, `raw()`, `env()`, `mock()`,
-`assert_success()`, `assert_failure()`, `assert_output()`,
-`assert_json_value()`.
+Has a `fromTransform` flag (set `true` by the Vite transform) so the runner
+only processes transform-originated ScriptBuilders. Uses a `globalThis`
+registry shared across Vite module runner contexts.
+
+Key methods: `run()`, `raw()`, `env()`, `mock()`, `flags()`,
+`assert_success()`, `assert_failure()`, `assert_output()`, `assert_line()`,
+`assert_json_value()`, `assert()`, `exit()`.
 
 ### BatsCoverageReporter (coverage-reporter.ts)
 
-Implements `onCoverage()` hook. Parses kcov's cobertura.xml output from
-`.vitest-bats-cache/kcov/*/cobertura.xml` and converts to Istanbul format,
-then injects into the v8 CoverageMap via `addFileCoverage()`.
+Constructor: `new BatsCoverageReporter(cacheDir, { thresholds?, statementPassThrough? })`.
+Always injected by BatsPlugin when coverage is enabled. Implements `onCoverage()`
+hook: parses kcov cobertura.xml, converts to Istanbul format, and injects into
+the v8 CoverageMap. Adds synthetic branch/function entries to satisfy threshold
+checks (kcov only tracks statements/lines). When `statementPassThrough` is
+true (kcov unreliable), also synthesizes statement data so scripts are neutral
+in threshold checks.
 
 ## Dependencies
 

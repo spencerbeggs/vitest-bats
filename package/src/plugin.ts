@@ -1,13 +1,19 @@
 import { execSync } from "node:child_process";
-import { existsSync, realpathSync } from "node:fs";
+import { existsSync, mkdirSync, realpathSync, writeFileSync } from "node:fs";
 import { type as osType } from "node:os";
-import { dirname, resolve } from "node:path";
+import { basename, dirname, resolve } from "node:path";
+import type { Plugin } from "vitest/config";
 import type { VitestPluginContext } from "vitest/node";
 import type { LinkFormat, LogLevel } from "./vitest-kcov-types.js";
 
 export interface BatsPluginOptions {
-	/** Inject KcovVerboseReporter. Default: true */
-	reporter?: boolean;
+	/**
+	 * Shell script coverage mode. Default: "auto"
+	 * - "auto": include .sh in coverage when kcov is available, exclude when not
+	 * - true: require kcov, throw if unavailable, include .sh in coverage
+	 * - false: always exclude .sh from coverage
+	 */
+	coverage?: "auto" | boolean;
 	/** Log level for detection output. Default: "errors-only" */
 	logLevel?: LogLevel;
 	/** Hyperlink format for reporter. Default: "auto" */
@@ -152,40 +158,148 @@ function checkDependencies(options: BatsPluginOptions, coverageEnabled: boolean)
 	return deps;
 }
 
-export function BatsPlugin(options: BatsPluginOptions = {}): {
-	name: string;
-	configureVitest: (ctx: VitestPluginContext) => Promise<void>;
-} {
+const VIRTUAL_PREFIX = "\0bats:";
+
+export function BatsPlugin(options: BatsPluginOptions = {}): Plugin {
+	const registeredScripts: string[] = [];
+	let cacheDir: string | null = null;
+
+	function writeManifest(): void {
+		if (!cacheDir) return;
+		writeFileSync(resolve(cacheDir, "scripts.json"), JSON.stringify(registeredScripts, null, "\t"), "utf-8");
+	}
+
 	return {
 		name: "vitest-bats",
+		enforce: "pre" as const,
+
+		config(config) {
+			const testConfig = (config as Record<string, Record<string, unknown>>).test;
+			const userRunner = testConfig?.runner as string | undefined;
+			if (userRunner && userRunner !== "vitest-bats/runner") {
+				throw new Error(
+					`[vitest-bats] A custom test runner is already configured: "${userRunner}". ` +
+						"BatsPlugin manages the runner automatically. Remove the runner option from your vitest config.",
+				);
+			}
+			return { test: { runner: "vitest-bats/runner" } };
+		},
+
+		resolveId(source, importer) {
+			if (source.endsWith(".sh") && importer) {
+				const resolved = resolve(dirname(importer), source);
+				if (existsSync(resolved)) {
+					return VIRTUAL_PREFIX + resolved;
+				}
+			}
+			return null;
+		},
+
+		load(id) {
+			if (!id.startsWith(VIRTUAL_PREFIX)) return null;
+
+			const scriptPath = id.slice(VIRTUAL_PREFIX.length);
+			const scriptName = basename(scriptPath);
+
+			if (!registeredScripts.includes(scriptPath)) {
+				registeredScripts.push(scriptPath);
+				writeManifest();
+			}
+
+			return [
+				'import { createBatsScript } from "vitest-bats/runtime";',
+				`export default createBatsScript(${JSON.stringify(scriptPath)}, ${JSON.stringify(scriptName)}, true);`,
+			].join("\n");
+		},
+
 		async configureVitest(ctx: VitestPluginContext) {
 			const { vitest } = ctx;
 
+			// Derive cache dir from Vite's cacheDir, scoped under vitest-bats/
+			cacheDir = resolve((vitest.vite?.config?.cacheDir as string) ?? "node_modules/.vite", "vitest-bats");
+			mkdirSync(cacheDir, { recursive: true });
+
 			// Read coverage.enabled from Vitest config
-			const coverageCfg = vitest.config.coverage as { enabled?: boolean } | undefined;
+			const coverageCfg = vitest.config.coverage as
+				| {
+						enabled?: boolean;
+						exclude?: string[];
+				  }
+				| undefined;
 			const coverageEnabled = coverageCfg?.enabled === true;
 
-			// 1. Check dependencies and set env vars
-			checkDependencies(options, coverageEnabled);
+			// Check dependencies and set env vars
+			const deps = checkDependencies(options, coverageEnabled);
 
-			// 2. Set BatsHelper cache dir via env var
-			const cacheDir = resolve(process.cwd(), ".vitest-bats-cache");
-			process.env.__VITEST_KCOV_BATS_HELPER_CACHE_DIR__ = cacheDir;
+			// Determine shell script coverage mode
+			const coverageMode = options.coverage ?? "auto";
+			const kcovAvailable = deps.some((d) => d.name === "kcov" && d.available);
 
-			// 3. Inject coverage-merging reporter (must be first to mutate CoverageMap)
-			if (coverageEnabled) {
-				const { BatsCoverageReporter } = await import("./coverage-reporter.js");
-				const coverageReporter = new BatsCoverageReporter(cacheDir);
-				(vitest.config.reporters as unknown[]).unshift(coverageReporter);
+			// kcov is unreliable on macOS due to SIP blocking ptrace
+			const onMacOS = osType() === "Darwin";
+			const kcovReliable = kcovAvailable && !onMacOS;
+
+			let includeShCoverage = false;
+			if (coverageMode === true) {
+				if (!kcovAvailable) {
+					throw new Error(
+						"[vitest-bats] coverage: true requires kcov but it is not available. " +
+							"Install kcov or use coverage: 'auto' to skip shell coverage when unavailable.",
+					);
+				}
+				if (onMacOS) {
+					throw new Error(
+						"[vitest-bats] coverage: true is not supported on macOS (SIP blocks kcov ptrace). " +
+							"Use Docker for reliable shell coverage or coverage: 'auto'.",
+					);
+				}
+				includeShCoverage = true;
+			} else if (coverageMode === "auto") {
+				includeShCoverage = kcovReliable;
+			}
+			// coverageMode === false: includeShCoverage stays false
+
+			// Tell the runner whether to use kcov and where to write coverage
+			if (includeShCoverage) {
+				process.env.__VITEST_BATS_KCOV__ = "1";
+				process.env.__VITEST_BATS_CACHE_DIR__ = cacheDir;
 			}
 
-			// 4. Inject verbose reporter
-			if (options.reporter !== false) {
-				const { default: KcovVerboseReporter } = await import("./vitest-kcov-reporter-verbose.js");
-				const reporter = new KcovVerboseReporter({
-					debug: options.logLevel === "debug",
-				});
-				(vitest.config.reporters as unknown[]).push(reporter);
+			// Always inject coverage reporter when coverage is enabled.
+			// Thresholds are always passed so kcov entries get synthetic
+			// branch/function data (kcov only tracks statements/lines).
+			// When kcov is unreliable, statementPassThrough also synthesizes
+			// statement data so scripts are fully neutral in threshold checks.
+			if (coverageEnabled) {
+				const { BatsCoverageReporter } = await import("./coverage-reporter.js");
+
+				const rawThresholds = (
+					coverageCfg as {
+						thresholds?: {
+							statements?: number;
+							branches?: number;
+							functions?: number;
+							lines?: number;
+						};
+					}
+				)?.thresholds;
+
+				const thresholds = rawThresholds
+					? {
+							statements: rawThresholds.statements ?? 0,
+							branches: rawThresholds.branches ?? 0,
+							functions: rawThresholds.functions ?? 0,
+							lines: rawThresholds.lines ?? 0,
+						}
+					: undefined;
+
+				const reporters = vitest.config.reporters as unknown[];
+				reporters.unshift(
+					new BatsCoverageReporter(cacheDir, {
+						...(thresholds ? { thresholds } : {}),
+						statementPassThrough: !includeShCoverage,
+					}),
+				);
 			}
 		},
 	};

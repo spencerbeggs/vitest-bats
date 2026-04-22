@@ -1,0 +1,46 @@
+{
+	"version": "1.0.0",
+	"project": {
+		"name": "spencerbeggs/vitest-bats",
+		"type": "monorepo",
+		"repository": "https://github.com/spencerbeggs/vitest-bats",
+		"maintainer": "C. Spencer Beggs"
+	},
+	"paths": {
+		"designDocs": ".claude/design",
+		"context": "CLAUDE.md",
+		"localContext": "CLAUDE.local.md"
+	},
+	"modules": {
+		"vitest-bats": {
+			"path": "package",
+			"designDocsPath": ".claude/design/vitest-bats",
+			"categories": ["architecture", "api-reference"],
+			"maintainer": "C. Spencer Beggs"
+		}
+	},
+	"quality": {
+		"designDocs": {
+			"maxLineLength": 120,
+			"requireFrontmatter": true,
+			"requireTOC": false,
+			"minSections": ["Overview"]
+		},
+		"context": {
+			"rootMaxLines": 500,
+			"childMaxLines": 300,
+			"requireDesignDocPointers": true
+		}
+	},
+	"integration": {
+		"ci": {
+			"enabled": false,
+			"validateOnPR": false,
+			"syncOnMerge": false
+		},
+		"git": {
+			"trackDesignDocs": true,
+			"requireReviewForChanges": false
+		}
+	}
+}

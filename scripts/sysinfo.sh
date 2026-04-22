@@ -2,11 +2,16 @@
 set -euo pipefail
 
 FORMAT="json"
+VERBOSE=0
 
 while [[ $# -gt 0 ]]; do
 	case $1 in
 		--pretty)
 			FORMAT="pretty"
+			shift
+			;;
+		--verbose|-v)
+			VERBOSE=1
 			shift
 			;;
 		--help|-h)
@@ -27,6 +32,11 @@ done
 HOSTNAME_VAL=$(hostname)
 OS_TYPE=$(uname -s)
 CURRENT_DATE=$(date -u +"%Y-%m-%d")
+
+if [ "$VERBOSE" -eq 1 ]; then
+	echo "[DEBUG] Gathering system info..." >&2
+	echo "[DEBUG] Format: $FORMAT" >&2
+fi
 
 if [ "$FORMAT" = "pretty" ]; then
 	echo "System Information"

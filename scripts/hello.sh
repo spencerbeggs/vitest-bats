@@ -3,6 +3,13 @@ set -euo pipefail
 
 NAME="World"
 FORMAT="text"
+VERBOSE=0
+
+log_debug() {
+	local timestamp
+	timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+	echo "[DEBUG $timestamp] $1" >&2
+}
 
 while [[ $# -gt 0 ]]; do
 	case $1 in
@@ -12,6 +19,10 @@ while [[ $# -gt 0 ]]; do
 			;;
 		--json)
 			FORMAT="json"
+			shift
+			;;
+		--verbose|-v)
+			VERBOSE=1
 			shift
 			;;
 		--help|-h)
@@ -29,6 +40,10 @@ while [[ $# -gt 0 ]]; do
 			;;
 	esac
 done
+
+if [ "$VERBOSE" -eq 1 ]; then
+	log_debug "Format: $FORMAT, Name: $NAME"
+fi
 
 if [ "$FORMAT" = "json" ]; then
 	printf '{"greeting":"Hello %s"}\n' "$NAME"
