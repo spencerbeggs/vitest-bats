@@ -4,6 +4,12 @@
 
 Kcov requires Linux kernel features (ptrace) to collect coverage for bash scripts. On macOS, kcov cannot instrument bash scripts properly. Running tests in a Docker container with Linux solves this limitation.
 
+> **Alternative: Dev Container** -- The repository includes a
+> `.devcontainer/` configuration with bats, kcov, and all BATS libraries
+> pre-installed. Open the project in VS Code with the Dev Containers extension
+> or in GitHub Codespaces for coverage support without manual Docker commands.
+> See [CONTRIBUTING.md](../CONTRIBUTING.md) for details.
+
 ## Quick Start
 
 ### Option 1: Using npm script (Recommended)
@@ -141,18 +147,20 @@ vitest-bats/
 * Source files are mounted as volumes for quick iteration
 * Coverage output is mounted to avoid copying large files
 
-## Local vs Docker Testing
+## Local vs Docker vs Dev Container
 
-| Feature | Local (macOS) | Docker (Linux) |
-| ------- | ------------ | -------------- |
-| Test execution | ✅ Fast | ✅ Fast |
-| BATS file generation | ✅ Works | ✅ Works |
-| Kcov coverage | ❌ 0% (not supported) | ✅ Full coverage |
-| Setup time | ⚡ Instant | 🐌 First build slow |
-| Subsequent runs | ⚡ Fast | ⚡ Fast (cached) |
+| Feature | Local (macOS) | Docker | Dev Container |
+| ------- | ------------ | ------ | ------------- |
+| Test execution | Fast | Fast | Fast |
+| BATS file generation | Works | Works | Works |
+| Kcov coverage | Not supported | Full coverage | Full coverage |
+| Setup time | Instant | First build slow | First build slow |
+| Subsequent runs | Fast | Fast (cached) | Fast |
+| IDE integration | Native | None | Full (VS Code) |
+| Codespaces support | No | No | Yes |
 
 **Recommendation**:
 
 * Use local testing for rapid development and debugging
-* Use Docker for accurate coverage collection before commits
-* Use Docker in CI/CD pipelines
+* Use the dev container for full coverage with IDE integration
+* Use Docker for headless coverage collection and CI/CD pipelines

@@ -20,6 +20,7 @@ vitest-bats/
   package/              # npm package (published as `vitest-bats`)
   scripts/              # Example shell scripts for testing
   __test__/             # Integration tests consuming the package
+  .devcontainer/        # Dev container with bats, kcov, and all BATS libs
   Dockerfile.test       # Docker env for kcov (macOS SIP workaround)
   docker-compose.test.yml
 ```
@@ -141,6 +142,9 @@ Packages publish to both GitHub Packages and npm with provenance via
   includes `__test__/**/*.test.ts`. Coverage excludes `plugin.ts`, `runner.ts`,
   and `index.ts` (integration-tested only).
 - **Docker**: Use `docker-compose.test.yml` for full kcov coverage on macOS
+- **Devcontainer**: `.devcontainer/` provides bats, kcov, and all BATS libraries
+  natively. Works in VS Code and GitHub Codespaces. Preferred over Docker for
+  development -- kcov runs without SIP restrictions.
 
 ### Test Directory
 

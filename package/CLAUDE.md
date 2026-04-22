@@ -90,13 +90,15 @@ pnpm run build:dev         # Development build
 pnpm run build:prod        # Production build
 ```
 
-## Docker for Coverage
+## Coverage Environment
 
-kcov requires `ptrace` (blocked by macOS SIP). Use Docker:
+kcov requires `ptrace` (blocked by macOS SIP). Two options:
 
-- `Dockerfile.test` in repo root installs kcov from source + BATS libraries
-- `docker-compose.test.yml` adds `SYS_PTRACE` capability
-- Set `HTE_PATH_REWRITE=/workspace:$PWD` for clickable hyperlinks from Docker
+- **Devcontainer** (preferred): `.devcontainer/` has bats, kcov, and all BATS
+  libraries pre-installed. Works in VS Code and GitHub Codespaces.
+- **Docker**: `Dockerfile.test` + `docker-compose.test.yml` in repo root.
+  Adds `SYS_PTRACE` capability. Set `HTE_PATH_REWRITE=/workspace:$PWD` for
+  clickable hyperlinks.
 
 ## Design Documentation
 

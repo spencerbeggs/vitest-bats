@@ -14,6 +14,7 @@
 **/.cache
 coverage/
 .vitest-bats-cache/
+.pnpm-store/
 **/*.asc
 pnpm-publish-summary.json
 pnpm-release.json
@@ -35,3 +36,4 @@ pnpm-release.json
 .playwright-mcp
 docs/superpowers/
 .mcp.json
+

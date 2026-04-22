@@ -17,6 +17,8 @@ existing v8 coverage report.
   (VSCode, WezTerm, iTerm2)
 - **Docker support** -- Dockerfile and Compose config for full kcov coverage on
   macOS (where SIP blocks ptrace)
+- **Dev container** -- Pre-configured devcontainer with bats, kcov, and all BATS
+  libraries for VS Code and GitHub Codespaces
 
 ## Quick Start
 
@@ -91,8 +93,9 @@ BatsPlugin checks for these at startup and reports what is missing:
 | kcov | Coverage only | `brew install kcov` | `apt-get install kcov` |
 
 kcov coverage collection requires Linux. On macOS, tests run but coverage is
-not collected due to SIP restrictions on ptrace. Use Docker for full coverage
-on macOS -- see [docs/docker-coverage.md](docs/docker-coverage.md).
+not collected due to SIP restrictions on ptrace. Use the
+[dev container](.devcontainer/) or Docker for full coverage on macOS -- see
+[docs/docker-coverage.md](docs/docker-coverage.md).
 
 ## Documentation
 
@@ -108,6 +111,7 @@ on macOS -- see [docs/docker-coverage.md](docs/docker-coverage.md).
 package/           Published npm package (vitest-bats)
 scripts/           Example shell scripts for testing
 __test__/          Integration tests consuming the package
+.devcontainer/     Dev container for VS Code / Codespaces
 Dockerfile.test    Docker environment for kcov coverage
 docker-compose.test.yml
 ```

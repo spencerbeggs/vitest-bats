@@ -1,16 +1,16 @@
 {
-	"name": "pnpm Module Template",
+	"name": "vitest-bats",
 	"build": {
 		"dockerfile": "Dockerfile",
 		"args": {
 			"TZ": "${localEnv:TZ:America/New_York}",
-			"CLAUDE_CODE_VERSION": "latest",
 			"GIT_DELTA_VERSION": "0.18.2",
 			"ZSH_IN_DOCKER_VERSION": "1.2.0",
-			"PNPM_VERSION": "10.33.0"
+			"PNPM_VERSION": "10.33.0",
+			"BIOME_VERSION": "2.4.9"
 		}
 	},
-	"runArgs": ["--cap-add=NET_ADMIN", "--cap-add=NET_RAW"],
+	"runArgs": ["--cap-add=NET_ADMIN", "--cap-add=NET_RAW", "--cap-add=SYS_PTRACE", "--security-opt=apparmor:unconfined"],
 	"customizations": {
 		"vscode": {
 			"extensions": [
@@ -66,16 +66,21 @@
 	"remoteUser": "node",
 	"mounts": [
 		"source=claude-code-bashhistory-${devcontainerId},target=/commandhistory,type=volume",
-		"source=claude-code-config-${devcontainerId},target=/home/node/.claude,type=volume"
+		"source=claude-code-config-${devcontainerId},target=/home/node/.claude,type=volume",
+		"source=pnpm-store-${devcontainerId},target=/home/node/.local/share/pnpm,type=volume",
+		"source=node-modules-${devcontainerId},target=/workspaces/vitest-bats/node_modules,type=volume",
+		"source=pkg-node-modules-${devcontainerId},target=/workspaces/vitest-bats/package/node_modules,type=volume",
+		"source=vscode-server-${devcontainerId},target=/home/node/.vscode-server,type=volume"
 	],
 	"containerEnv": {
 		"NODE_OPTIONS": "--max-old-space-size=4096",
 		"CLAUDE_CONFIG_DIR": "/home/node/.claude",
+		"COREPACK_ENABLE_DOWNLOAD_PROMPT": "0",
+		"npm_config_store_dir": "/home/node/.local/share/pnpm/store",
 		"POWERLEVEL9K_DISABLE_GITSTATUS": "true"
 	},
-	"workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=delegated",
-	"workspaceFolder": "/workspace",
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 	"postCreateCommand": "bash .devcontainer/postCreate.sh",
-	"postStartCommand": "sudo /usr/local/bin/init-firewall.sh",
+	"postStartCommand": "if [ \"${CODESPACES:-}\" = \"true\" ]; then echo 'Codespaces detected, skipping firewall'; else sudo /usr/local/bin/init-firewall.sh; fi",
 	"waitFor": "postStartCommand"
 }
