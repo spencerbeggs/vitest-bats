@@ -40,6 +40,8 @@
 		"prepare": "husky",
 		"test": "vitest run",
 		"test:coverage": "vitest run --coverage",
+		"test:docker": "docker compose -f docker-compose.test.yml up --build --abort-on-container-exit",
+		"test:local": "pnpm run build && vitest run --coverage",
 		"test:watch": "vitest --watch",
 		"typecheck": "turbo run types:check --log-prefix=none --log-order=grouped",
 		"types:check": "tsgo --noEmit"

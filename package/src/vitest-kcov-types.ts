@@ -120,7 +120,7 @@ export interface KcovOptions {
 	 * // Reports output to: coverage/foo/bar
 	 * ```
 	 *
-	 * @default "kcov"
+	 * @defaultValue "kcov"
 	 */
 	subdir?: string;
 	/**
@@ -147,7 +147,7 @@ export interface KcovOptions {
 	 * cacheDir: "/tmp/bats-cache"
 	 * ```
 	 *
-	 * @default "../bats-cache"
+	 * @defaultValue "../bats-cache"
 	 */
 	cacheDir?: string;
 	/**
@@ -157,7 +157,7 @@ export interface KcovOptions {
 	 * When true, removes the entire reports directory (reportsDirectory + subdir) before
 	 * running tests to ensure a fresh start.
 	 *
-	 * @default true
+	 * @defaultValue true
 	 */
 	clean?: boolean;
 	/**
@@ -167,7 +167,7 @@ export interface KcovOptions {
 	 * When true, removes the cache directory before running tests to ensure fresh
 	 * .bats files are generated and no stale kcov data exists.
 	 *
-	 * @default true
+	 * @defaultValue true
 	 */
 	cleanCache?: boolean;
 	/**
@@ -201,7 +201,7 @@ export interface KcovOptions {
 	 * // Cache: coverage/2025-11-12_14-30-45/kcov-cache
 	 * ```
 	 *
-	 * @default false
+	 * @defaultValue false
 	 */
 	incremental?: boolean;
 	/**

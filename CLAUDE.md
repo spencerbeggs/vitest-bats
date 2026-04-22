@@ -30,12 +30,17 @@ This is a pnpm workspace. The root `package.json` is `@spencerbeggs/vitest-bats`
 ## Key APIs
 
 - **`BatsPlugin()`** -- Vitest plugin. Add to `plugins` array in
-  `vitest.config.ts`. Handles dependency detection, reporter injection, and
-  environment setup.
-- **`BatsHelper.describe(scriptPath, fn)`** -- Test-writing API. Wraps
-  `vitest.describe()` with BATS lifecycle. Tests use fluent assertion builder.
-- **`BatsCoverageReporter`** -- Merges kcov cobertura.xml data into v8
-  Istanbul CoverageMap via `onCoverage()` hook.
+  `vitest.config.ts`. Provides Vite transform for `.sh` imports, dependency
+  detection, coverage option, and reporter injection. Auto-injects the custom
+  BatsRunner via its `config` hook -- do not set `runner` manually.
+- **`.sh` imports** -- `import hello from "../scripts/hello.sh"` returns a
+  ScriptBuilder (with `fromTransform: true` for runner scoping). Use with
+  standard vitest `test()` blocks. The runner generates and executes `.bats`
+  files automatically.
+- **`BatsCoverageReporter`** -- Constructor takes
+  `(cacheDir, { thresholds?, statementPassThrough? })`. Always injected when
+  coverage is enabled. Merges kcov data into v8 Istanbul CoverageMap with
+  synthetic branch/function entries to satisfy threshold checks.
 
 See `package/CLAUDE.md` for package-specific guidance.
 
@@ -133,7 +138,8 @@ Packages publish to both GitHub Packages and npm with provenance via
 - **Framework**: [Vitest](https://vitest.dev/) with v8 coverage provider
 - **Pool**: Uses `forks` (not threads) for broader compatibility
 - **Config**: `vitest.config.ts` uses `BatsPlugin()` from `vitest-bats` and
-  includes `__test__/**/*.test.ts`
+  includes `__test__/**/*.test.ts`. Coverage excludes `plugin.ts`, `runner.ts`,
+  and `index.ts` (integration-tested only).
 - **Docker**: Use `docker-compose.test.yml` for full kcov coverage on macOS
 
 ### Test Directory

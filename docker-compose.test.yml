@@ -5,9 +5,7 @@ services:
       dockerfile: Dockerfile.test
     privileged: true
     volumes:
-      # Mount coverage directory to access reports from host
-      - ./coverage:/workspace/coverage
-      # Mount source files for development
+      # Mount source files for development iteration
       - ./package/src:/workspace/package/src
       - ./scripts:/workspace/scripts
       - ./__test__:/workspace/__test__
