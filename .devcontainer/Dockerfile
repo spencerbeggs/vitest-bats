@@ -3,7 +3,6 @@ FROM node:24-bookworm
 ARG TZ
 ENV TZ="$TZ"
 
-ARG CLAUDE_CODE_VERSION=latest
 ARG PNPM_VERSION=10.33.0
 ARG BIOME_VERSION=2.4.9
 
@@ -49,8 +48,9 @@ ENV LANG=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
 
 # Install kcov from source (required for bash coverage collection)
+ARG KCOV_VERSION=v43
 RUN cd /tmp && \
-  git clone --depth 1 https://github.com/SimonKagstrom/kcov.git && \
+  git clone --depth 1 --branch ${KCOV_VERSION} https://github.com/SimonKagstrom/kcov.git && \
   cd kcov && \
   mkdir build && \
   cd build && \
@@ -61,31 +61,36 @@ RUN cd /tmp && \
   rm -rf /tmp/kcov
 
 # Install BATS (Bash Automated Testing System)
+ARG BATS_VERSION=v1.13.0
 RUN cd /tmp && \
-  git clone --depth 1 https://github.com/bats-core/bats-core.git && \
+  git clone --depth 1 --branch ${BATS_VERSION} https://github.com/bats-core/bats-core.git && \
   cd bats-core && \
   ./install.sh /usr/local && \
   cd / && \
   rm -rf /tmp/bats-core
 
 # Install bats-support library
+ARG BATS_SUPPORT_VERSION=v0.3.0
 RUN mkdir -p /usr/local/lib && \
   cd /tmp && \
-  git clone --depth 1 https://github.com/bats-core/bats-support.git && \
+  git clone --depth 1 --branch ${BATS_SUPPORT_VERSION} https://github.com/bats-core/bats-support.git && \
   cp -r bats-support /usr/local/lib/ && \
   rm -rf /tmp/bats-support
 
 # Install bats-assert library
+ARG BATS_ASSERT_VERSION=v2.2.4
 RUN mkdir -p /usr/local/lib && \
   cd /tmp && \
-  git clone --depth 1 https://github.com/bats-core/bats-assert.git && \
+  git clone --depth 1 --branch ${BATS_ASSERT_VERSION} https://github.com/bats-core/bats-assert.git && \
   cp -r bats-assert /usr/local/lib/ && \
   rm -rf /tmp/bats-assert
 
-# Install bats-mock for command mocking
+# Install bats-mock for command mocking (no release tags, pin to commit)
+ARG BATS_MOCK_COMMIT=2bf74218
 RUN mkdir -p /usr/local/lib/bats-mock && \
   cd /tmp && \
-  git clone --depth 1 https://github.com/jasonkarns/bats-mock.git && \
+  git clone https://github.com/jasonkarns/bats-mock.git && \
+  cd bats-mock && git checkout ${BATS_MOCK_COMMIT} && cd /tmp && \
   cp bats-mock/stub.bash bats-mock/binstub /usr/local/lib/bats-mock/ && \
   chmod +x /usr/local/lib/bats-mock/binstub && \
   echo 'source "$(dirname "${BASH_SOURCE[0]}")/stub.bash"' > /usr/local/lib/bats-mock/load.bash && \
@@ -111,6 +116,7 @@ RUN mkdir -p /home/node/.claude /home/node/.local/share/pnpm /home/node/.vscode-
   chown -R node:node /home/node/.claude /home/node/.local/share/pnpm /home/node/.vscode-server
 
 # Pre-create node_modules directories owned by node so volume mounts inherit correct permissions
+# Note: paths match the volume mounts in devcontainer.json (hardcoded to repo name)
 RUN mkdir -p /workspaces/vitest-bats/node_modules /workspaces/vitest-bats/package/node_modules && \
   chown -R node:node /workspaces/vitest-bats
 
