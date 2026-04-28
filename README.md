@@ -8,13 +8,22 @@ existing v8 coverage report.
 ## Features
 
 - **Vitest plugin** -- `BatsPlugin()` handles all setup: dependency detection,
-  reporter injection, environment configuration
-- **TypeScript test API** -- `BatsHelper.describe()` lets you write BATS tests
-  in TypeScript with a fluent assertion builder
+  reporter injection, environment configuration, and matcher registration
+- **Native `.sh` imports** -- `import script from "./hello.sh"` returns a
+  builder. Configure with `env()` / `flags()` / `mock()`, terminate with
+  `run(...args)` or `exec(shellExpr)`.
+- **23 `expect.extend` matchers** -- status, output, stderr, lines, JSON,
+  schema validation, and mock invocation. Auto-registered via setup file.
+- **Schema validation** -- `toMatchSchema` accepts any
+  [Standard Schema](https://github.com/standard-schema/standard-schema)
+  validator (Zod, Valibot, Arktype, Effect Schema). `toMatchJsonSchema`
+  validates raw JSON Schema via Ajv.
+- **Self-contained command mocking** -- shim binaries record calls and emit
+  pre-recorded responses. No `bats-mock` runtime dependency.
 - **Unified coverage** -- `BatsCoverageReporter` merges kcov shell script
-  coverage into Vitest's v8 Istanbul CoverageMap
+  coverage into Vitest's v8 Istanbul CoverageMap.
 - **Terminal hyperlinks** -- OSC 8 clickable links in supported terminals
-  (VSCode, WezTerm, iTerm2)
+  (VS Code, WezTerm, iTerm2)
 - **Docker support** -- Dockerfile and Compose config for full kcov coverage on
   macOS (where SIP blocks ptrace)
 - **Dev container** -- Pre-configured devcontainer with bats, kcov, and all BATS
@@ -45,30 +54,43 @@ export default defineConfig({
 });
 ```
 
+The plugin auto-injects `vitest-bats/setup` into `test.setupFiles`. Do not
+add it manually.
+
+Add `vitest-bats` to `tsconfig.json` `types` so TypeScript understands `.sh`
+imports:
+
+```json
+{
+  "compilerOptions": {
+    "types": ["vitest-bats"]
+  }
+}
+```
+
 Write a test:
 
 ```typescript
-import { BatsHelper } from "vitest-bats";
+import { describe, expect, test } from "vitest";
+import hello from "../scripts/hello.sh";
 
-const scriptPath = import.meta.resolve("../scripts/hello.sh");
-
-BatsHelper.describe(scriptPath, (helper) => {
-  helper.test("outputs default greeting", (script) => {
-    script.run('"$SCRIPT"');
-    script.assert_success();
-    script.assert_output({ partial: "Hello World" });
+describe("hello.sh", () => {
+  test("outputs default greeting", () => {
+    const result = hello.run();
+    expect(result).toSucceed();
+    expect(result).toContainOutput("Hello World");
   });
 
-  helper.test("greets by name", (script) => {
-    script.run('"$SCRIPT" --name Alice');
-    script.assert_success();
-    script.assert_output({ partial: "Hello Alice" });
+  test("greets by name", () => {
+    const result = hello.run("--name", "Alice");
+    expect(result).toSucceed();
+    expect(result).toContainOutput("Hello Alice");
   });
 
-  helper.test("outputs JSON", (script) => {
-    script.run('"$SCRIPT" --json');
-    script.assert_success();
-    script.assert_json_value("greeting", "Hello World");
+  test("outputs JSON", () => {
+    const result = hello.run("--json");
+    expect(result).toSucceed();
+    expect(result).toHaveJsonValue("greeting", "Hello World");
   });
 });
 ```
@@ -79,18 +101,25 @@ Run tests:
 vitest run
 ```
 
+`run()` returns a `BatsResult` synchronously. `await` is harmless but
+unnecessary -- `BatsResult` is not thenable.
+
 ## System Dependencies
 
-BatsPlugin checks for these at startup and reports what is missing:
+`BatsPlugin` checks for these at startup and reports what is missing:
 
 | Dependency | Required | Install (macOS) | Install (Linux) |
 | --- | --- | --- | --- |
-| bats | Yes | `brew install bats-core` | `apt-get install bats` |
+| bats (>= 1.5) | Yes | `brew install bats-core` | `apt-get install bats` |
 | bats-support | Yes | `brew install bats-support` | `apt-get install bats-support` |
 | bats-assert | Yes | `brew install bats-assert` | `apt-get install bats-assert` |
 | bats-mock | Yes | `brew install bats-mock` | `apt-get install bats-file` |
 | jq | Yes | `brew install jq` | `apt-get install jq` |
 | kcov | Coverage only | `brew install kcov` | `apt-get install kcov` |
+
+`bats-assert` and `bats-mock` are still detected at startup for compatibility
+warnings; the runtime no longer loads them. Mocks are self-contained, and
+assertions happen in TypeScript via the matchers.
 
 kcov coverage collection requires Linux. On macOS, tests run but coverage is
 not collected due to SIP restrictions on ptrace. Use the
@@ -99,11 +128,12 @@ not collected due to SIP restrictions on ptrace. Use the
 
 ## Documentation
 
-- [Testing Helpers API](docs/testing-helpers.md) -- `script.mock()`,
-  `script.assert_json_value()`, and advanced usage
-- [Non-Executable Scripts](docs/non-executable-scripts.md) -- Testing scripts
-  without the executable bit
-- [Docker Coverage](docs/docker-coverage.md) -- Running kcov in Docker on macOS
+- [Testing Helpers API](docs/testing-helpers.md) -- builder, matchers,
+  `mock()`, schema validation, and advanced usage
+- [Non-Executable Scripts](docs/non-executable-scripts.md) -- testing
+  scripts without the executable bit
+- [Docker Coverage](docs/docker-coverage.md) -- running kcov in Docker on
+  macOS
 
 ## Project Structure
 

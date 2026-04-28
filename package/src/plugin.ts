@@ -79,10 +79,12 @@ function detectBatsLibraryPath(libraryName: string, fileName: string): string | 
 
 function getInstallCommand(name: string, onMacOS: boolean): string {
 	const commands: Record<string, { mac: string; linux: string }> = {
-		bats: { mac: "brew install bats-core", linux: "apt-get install bats" },
+		bats: {
+			mac: "brew install bats-core (requires >= 1.5)",
+			linux:
+				"apt-get install bats (requires >= 1.5; some distros ship older — see https://github.com/bats-core/bats-core)",
+		},
 		"bats-support": { mac: "brew install bats-support", linux: "apt-get install bats-support" },
-		"bats-assert": { mac: "brew install bats-assert", linux: "apt-get install bats-assert" },
-		"bats-mock": { mac: "brew install bats-mock", linux: "apt-get install bats-file" },
 		kcov: { mac: "brew install kcov", linux: "apt-get install kcov" },
 		jq: { mac: "brew install jq", linux: "apt-get install jq" },
 	};
@@ -96,21 +98,43 @@ function checkDependencies(options: BatsPluginOptions, coverageEnabled: boolean,
 
 	// bats
 	const batsPath = getCommandPath("bats");
-	deps.push({ name: "bats", required: true, available: batsPath !== null, path: batsPath });
+	let batsVersionOk = batsPath !== null;
+	if (batsPath) {
+		try {
+			const versionOut = execSync(`"${batsPath}" --version`, {
+				encoding: "utf-8",
+				stdio: "pipe",
+			}).trim();
+			// Format: "Bats 1.10.0" → take last token, parse semver-ish prefix
+			const tok = versionOut.split(/\s+/).pop() ?? "";
+			const m = tok.match(/^(\d+)\.(\d+)/);
+			if (!m) {
+				batsVersionOk = false;
+			} else {
+				const major = Number(m[1]);
+				const minor = Number(m[2]);
+				batsVersionOk = major > 1 || (major === 1 && minor >= 5);
+			}
+		} catch {
+			batsVersionOk = false;
+		}
+	}
+	deps.push({
+		name: "bats",
+		required: true,
+		available: batsVersionOk,
+		path: batsPath,
+		...(batsPath && !batsVersionOk ? { warning: "BATS >= 1.5 required for --separate-stderr" } : {}),
+	});
 
-	// bats-support
+	// bats-support — needed because the generated .bats files load it for `run`
+	// support. bats-assert and bats-mock are NOT loaded by the generator
+	// (assertions moved to JS-side matchers; mocks use a self-contained
+	// recorder shim) so they aren't probed.
 	const supportPath = detectBatsLibraryPath("bats-support", "load.bash");
 	deps.push({ name: "bats-support", required: true, available: supportPath !== null, path: supportPath });
 
-	// bats-assert
-	const assertPath = detectBatsLibraryPath("bats-assert", "load.bash");
-	deps.push({ name: "bats-assert", required: true, available: assertPath !== null, path: assertPath });
-
-	// bats-mock
-	const mockPath = detectBatsLibraryPath("bats-mock", "stub.bash");
-	deps.push({ name: "bats-mock", required: true, available: mockPath !== null, path: mockPath });
-
-	// jq
+	// jq — used inside the recorder shim to JSON-encode mock invocation args.
 	const jqPath = getCommandPath("jq");
 	deps.push({ name: "jq", required: true, available: jqPath !== null, path: jqPath });
 
@@ -131,8 +155,6 @@ function checkDependencies(options: BatsPluginOptions, coverageEnabled: boolean,
 	// Export env vars for found dependencies
 	if (batsPath) process.env.BATS_PATH = batsPath;
 	if (supportPath) process.env.BATS_SUPPORT_PATH = supportPath;
-	if (assertPath) process.env.BATS_ASSERT_PATH = assertPath;
-	if (mockPath) process.env.BATS_MOCK_PATH = mockPath;
 	if (coverageEnabled) {
 		const kcovDep = deps.find((d) => d.name === "kcov");
 		if (kcovDep?.path) process.env.KCOV_PATH = kcovDep.path;
@@ -183,15 +205,15 @@ export function BatsPlugin(options: BatsPluginOptions = {}): Plugin {
 		enforce: "pre" as const,
 
 		config(config) {
-			const testConfig = (config as Record<string, Record<string, unknown>>).test;
-			const userRunner = testConfig?.runner as string | undefined;
-			if (userRunner && userRunner !== "vitest-bats/runner") {
-				throw new Error(
-					`[vitest-bats] A custom test runner is already configured: "${userRunner}". ` +
-						"BatsPlugin manages the runner automatically. Remove the runner option from your vitest config.",
-				);
-			}
-			return { test: { runner: "vitest-bats/runner" } };
+			const testConfig = (config as Record<string, Record<string, unknown>>).test ?? {};
+			const setup = testConfig.setupFiles;
+			const newSetup =
+				setup === undefined
+					? ["vitest-bats/setup"]
+					: Array.isArray(setup)
+						? [...setup, "vitest-bats/setup"]
+						: [setup, "vitest-bats/setup"];
+			return { test: { setupFiles: newSetup } };
 		},
 
 		resolveId(source, importer) {
@@ -216,16 +238,21 @@ export function BatsPlugin(options: BatsPluginOptions = {}): Plugin {
 			}
 
 			return [
-				'import { createBatsScript } from "vitest-bats/runtime";',
-				`export default createBatsScript(${JSON.stringify(scriptPath)}, ${JSON.stringify(scriptName)}, true);`,
+				'import { ScriptBuilder } from "vitest-bats/runtime";',
+				`export default new ScriptBuilder(${JSON.stringify(scriptPath)}, ${JSON.stringify(scriptName)});`,
 			].join("\n");
 		},
 
 		async configureVitest(ctx: VitestPluginContext) {
 			const { vitest } = ctx;
 
-			// Derive cache dir from Vite's cacheDir, scoped under vitest-bats/
-			cacheDir = resolve((vitest.vite?.config?.cacheDir as string) ?? "node_modules/.vite", "vitest-bats");
+			// Derive cache dir from Vitest's cacheDir (defaults to node_modules/.vitest),
+			// falling back to Vite's cacheDir for older configurations.
+			const vitestCacheDir =
+				(vitest.config as { cacheDir?: string }).cacheDir ??
+				(vitest.vite?.config?.cacheDir as string | undefined) ??
+				"node_modules/.vitest";
+			cacheDir = resolve(vitestCacheDir, "vitest-bats");
 			mkdirSync(cacheDir, { recursive: true });
 
 			// Read coverage.enabled from Vitest config
@@ -280,10 +307,11 @@ export function BatsPlugin(options: BatsPluginOptions = {}): Plugin {
 			}
 			// coverageMode === false: includeShCoverage stays false
 
-			// Tell the runner whether to use kcov and where to write coverage
+			// Always export the cache dir so the executor can locate the recorder
+			// and kcov outputs (when enabled) regardless of coverage state.
+			process.env.__VITEST_BATS_CACHE_DIR__ = cacheDir;
 			if (includeShCoverage) {
 				process.env.__VITEST_BATS_KCOV__ = "1";
-				process.env.__VITEST_BATS_CACHE_DIR__ = cacheDir;
 			}
 
 			// Always inject coverage reporter when coverage is enabled.

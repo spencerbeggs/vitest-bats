@@ -22,8 +22,8 @@
 	"type": "module",
 	"exports": {
 		".": "./src/index.ts",
-		"./runner": "./src/runner.ts",
-		"./runtime": "./src/runtime.ts"
+		"./runtime": "./src/runtime.ts",
+		"./setup": "./src/setup.ts"
 	},
 	"scripts": {
 		"build:dev": "rslib build --config-loader native --env-mode dev",
@@ -33,16 +33,19 @@
 		"types:check": "tsgo --noEmit"
 	},
 	"dependencies": {
-		"fast-xml-parser": "^5.7.1",
+		"@standard-schema/spec": "^1.1.0",
+		"ajv": "^8.20.0",
+		"ajv-formats": "^3.0.1",
+		"fast-xml-parser": "^5.7.2",
 		"minimatch": "^10.2.5"
 	},
 	"devDependencies": {
-		"@savvy-web/rslib-builder": "^0.20.1",
+		"@savvy-web/rslib-builder": "^0.20.3",
 		"@types/node": "catalog:silk",
 		"@typescript/native-preview": "catalog:silk",
 		"tsx": "catalog:silk",
 		"typescript": "catalog:silk",
-		"vite": "^8.0.9"
+		"vite": "^8.0.10"
 	},
 	"peerDependencies": {
 		"vitest": ">=4.1.0"

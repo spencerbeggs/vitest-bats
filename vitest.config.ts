@@ -16,7 +16,7 @@ export default defineConfig({
 				"package/src/vitest-kcov-types.ts",
 				"package/src/index.ts",
 				"package/src/plugin.ts",
-				"package/src/runner.ts",
+				"package/src/setup.ts",
 			],
 			thresholds: {
 				statements: 50,
