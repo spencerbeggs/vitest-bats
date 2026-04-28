@@ -36,3 +36,26 @@ __test__/
 - **Never inline large test data in test files.** Extract it to `fixtures/`.
 - **Never define shared mocks or helper functions in test files.** Extract them
   to the appropriate `utils/` directory so other tests can reuse them.
+
+## Shell Script Tests
+
+Tests for `.sh` scripts use `vitest-bats`. Import the script, configure the
+builder, terminate with `run(...args)` or `exec(shellExpr)`, and assert with
+the auto-registered `expect` matchers (e.g. `toSucceed`, `toContainOutput`,
+`toMatchOutput`, `toMatchSchema`). No custom runner, no `assert_*` methods.
+`run()` returns a non-thenable `BatsResult` — using `await` is harmless but
+unnecessary.
+
+```typescript
+import hello from "../scripts/hello.sh";
+
+test("greets", () => {
+  const result = hello.env({ NAME: "world" }).run("--upper");
+  expect(result).toSucceed();
+  expect(result).toMatchOutput(/HELLO/);
+});
+```
+
+For the full matcher list and builder API, see
+`@../../.claude/design/vitest-bats/api-reference.md`. Load only when authoring
+or debugging shell tests.

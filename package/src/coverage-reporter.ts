@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, rmSync, statSync } from "node:fs";
 import { basename, resolve } from "node:path";
 import { XMLParser } from "fast-xml-parser";
 
@@ -39,6 +39,15 @@ export class BatsCoverageReporter {
 		this.cacheDir = cacheDir;
 		this.thresholds = options.thresholds ?? false;
 		this.statementPassThrough = options.statementPassThrough ?? false;
+	}
+
+	onInit(): void {
+		// Clear stale kcov outputs from prior sessions so coverage merge only
+		// sees data from the current run.
+		const kcovDir = resolve(this.cacheDir, "kcov");
+		if (existsSync(kcovDir)) {
+			rmSync(kcovDir, { recursive: true, force: true });
+		}
 	}
 
 	onCoverage(coverage: unknown): void {

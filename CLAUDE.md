@@ -32,16 +32,19 @@ This is a pnpm workspace. The root `package.json` is `@spencerbeggs/vitest-bats`
 
 - **`BatsPlugin()`** -- Vitest plugin. Add to `plugins` array in
   `vitest.config.ts`. Provides Vite transform for `.sh` imports, dependency
-  detection, coverage option, and reporter injection. Auto-injects the custom
-  BatsRunner via its `config` hook -- do not set `runner` manually.
+  detection, coverage option, matcher setup-file injection, and reporter
+  injection. No custom runner -- tests use standard vitest `test()`.
 - **`.sh` imports** -- `import hello from "../scripts/hello.sh"` returns a
-  ScriptBuilder (with `fromTransform: true` for runner scoping). Use with
-  standard vitest `test()` blocks. The runner generates and executes `.bats`
-  files automatically.
-- **`BatsCoverageReporter`** -- Constructor takes
-  `(cacheDir, { thresholds?, statementPassThrough? })`. Always injected when
-  coverage is enabled. Merges kcov data into v8 Istanbul CoverageMap with
-  synthetic branch/function entries to satisfy threshold checks.
+  ScriptBuilder. Configure with `env()`/`flags()`/`mock()`, then terminate
+  with `run(...args)` or `exec(shellExpr)` to get a `BatsResult`. Assert with
+  the auto-registered `expect.extend` matchers (e.g.
+  `expect(result).toExitWith(0)`, `toMatchSchema(zodSchema)`).
+- **`BatsCoverageReporter`** -- Always injected when coverage is enabled.
+  Merges kcov data into v8 Istanbul CoverageMap with synthetic
+  branch/function entries to satisfy threshold checks.
+
+Public entry points: `vitest-bats` (main), `vitest-bats/runtime`,
+`vitest-bats/setup`. BATS >= 1.5 is required.
 
 See `package/CLAUDE.md` for package-specific guidance.
 
@@ -139,8 +142,8 @@ Packages publish to both GitHub Packages and npm with provenance via
 - **Framework**: [Vitest](https://vitest.dev/) with v8 coverage provider
 - **Pool**: Uses `forks` (not threads) for broader compatibility
 - **Config**: `vitest.config.ts` uses `BatsPlugin()` from `vitest-bats` and
-  includes `__test__/**/*.test.ts`. Coverage excludes `plugin.ts`, `runner.ts`,
-  and `index.ts` (integration-tested only).
+  includes `__test__/**/*.test.ts`. Coverage excludes `plugin.ts`,
+  `bats-executor.ts`, and `index.ts` (integration-tested only).
 - **Docker**: Use `docker-compose.test.yml` for full kcov coverage on macOS
 - **Devcontainer**: `.devcontainer/` provides bats, kcov, and all BATS libraries
   natively. Works in VS Code and GitHub Codespaces. Preferred over Docker for

@@ -1,1049 +1,667 @@
 # Testing Helpers API Reference
 
-This document provides detailed documentation for the testing helper APIs available in the BatsHelper framework for testing shell scripts.
+This document covers the runtime API exposed by `vitest-bats`: the
+`ScriptBuilder` returned from `.sh` imports, the `BatsResult` it produces,
+the 23 `expect.extend` matchers, and the schema-validation layer.
 
 ## Table of Contents
 
-* [Overview](#overview)
-* [script.mock() - Command Mocking](#scriptmock---command-mocking)
-* [script.assert_json_value() - JSON Assertions](#scriptassert_json_value---json-assertions)
-* [Advanced Usage](#advanced-usage)
-* [Best Practices](#best-practices)
-* [Implementation Details](#implementation-details)
-* [Troubleshooting](#troubleshooting)
+- [Overview](#overview)
+- [ScriptBuilder](#scriptbuilder)
+- [BatsResult](#batsresult)
+- [Matchers](#matchers)
+- [Schema Validation](#schema-validation)
+- [Mocking](#mocking)
+- [Advanced Usage](#advanced-usage)
+- [Best Practices](#best-practices)
+- [Troubleshooting](#troubleshooting)
 
 ## Overview
 
-The BatsHelper framework provides a fluent TypeScript API for writing BATS (Bash Automated Testing System) tests. This document focuses on two powerful testing helpers:
-
-1. **`script.mock()`** - Create fake binaries with controlled responses
-2. **`script.assert_json_value()`** - Assert JSON field values using dot notation
-
-These helpers significantly improve test readability, maintainability, and reliability when testing shell scripts that interact with external commands and produce JSON output.
-
-## script.mock() - Command Mocking
-
-### Purpose
-
-The `script.mock()` helper provides a declarative API for creating fake command-line binaries that respond to specific arguments. This is essential for testing scripts that depend on external tools (like package managers, CLI utilities, etc.) without requiring those tools to be installed or executing their actual implementations.
-
-### Signature
+`vitest-bats` registers a Vite transform that turns every `.sh` import into a
+fresh `ScriptBuilder` instance. Tests configure the builder with `env()`,
+`flags()`, and `mock()`, then call `run(...args)` or `exec(shellExpr)` to
+execute the script via BATS. Both terminators return a `BatsResult` that the
+auto-registered matchers operate on.
 
 ```typescript
-script.mock(
-  command: string,
-  config: Record<string, string | Record<string, string>>
-): this
-```
+import { describe, expect, test } from "vitest";
+import hello from "../scripts/hello.sh";
 
-### Parameters
-
-* **`command`** (string): The name of the command to mock (e.g., `"npm"`, `"git"`, `"docker"`)
-* **`config`** (object): Configuration object defining command responses
-  * Keys: Command-line arguments or flags (e.g., `"--version"`, `"status"`)
-  * Values: Either:
-    * **String**: Direct response to output when the argument matches
-    * **Object**: Nested commands for sub-command patterns (see [Nested Commands](#nested-commands))
-
-### Basic Usage
-
-#### Simple Command Mock
-
-Mock a command with a single argument:
-
-```typescript
-helper.test("checks version", (script) => {
-  // Mock the 'git' command to respond to --version
-  script.mock("git", {
-    "--version": "git version 2.39.0"
+describe("hello.sh", () => {
+  test("greets by name", () => {
+    const result = hello.run("--name", "Alice");
+    expect(result).toSucceed();
+    expect(result).toContainOutput("Hello Alice");
   });
-
-  script.env({ PATH: "$PWD/fake-bin:/usr/bin:/bin" });
-  script.raw("run git --version");
-  script.assert_success();
-  script.assert_output({ partial: "2.39.0" });
 });
 ```
 
-#### Multiple Arguments
+There is no custom test runner, no `BatsHelper.describe`, and no
+`script.assert_*` methods. Use Vitest's standard `describe` / `test` and
+the matchers below.
 
-Mock multiple independent arguments:
+## ScriptBuilder
 
-```typescript
-helper.test("handles multiple flags", (script) => {
-  script.mock("myapp", {
-    "--version": "1.0.0",
-    "--help": "Usage: myapp [options]",
-    "status": "Running"
-  });
+`ScriptBuilder` is the value returned by every `.sh` import. It is a
+config-then-execute builder: configuration methods accumulate state and
+return `this`; termination methods consume the state and return a
+`BatsResult`. Builder state is reset after every run (via a `finally`
+block) and again before each test (via the auto-injected `beforeEach`).
 
-  script.env({ PATH: "$PWD/fake-bin:/usr/bin:/bin" });
-  script.raw("run myapp --version");
-  script.assert_output({ partial: "1.0.0" });
+### Configuration
 
-  script.env({ PATH: "$PWD/fake-bin:/usr/bin:/bin" });
-  script.raw("run myapp status");
-  script.assert_output({ partial: "Running" });
-});
-```
+#### `env(vars: Record<string, string>): this`
 
-### Nested Commands
-
-For commands with sub-commands (like `npm config get prefix`), use nested objects:
+Set environment variables for the next run. Multiple calls accumulate.
 
 ```typescript
-helper.test("mocks nested config commands", (script) => {
-  script.mock("npm", {
-    "--version": "10.2.3",
-    config: {
-      "get prefix": "/usr/local",
-      "get cache": "/tmp/npm-cache",
-      "get registry": "https://registry.npmjs.org"
-    }
-  });
-
-  script.env({ PATH: "$PWD/fake-bin:/usr/bin:/bin" });
-  script.raw("run npm config get prefix");
-  script.assert_output({ partial: "/usr/local" });
-
-  script.env({ PATH: "$PWD/fake-bin:/usr/bin:/bin" });
-  script.raw("run npm config get cache");
-  script.assert_output({ partial: "/tmp/npm-cache" });
-});
+const result = hello.env({ NAME: "Alice", DEBUG: "1" }).run();
 ```
 
-### How It Works
+Generates: `NAME="Alice" DEBUG="1" run --separate-stderr "$SCRIPT"`
 
-When you call `script.mock("command", config)`, the helper:
+#### `flags(value: string): this`
 
-1. **Creates a `fake-bin/` directory** in the test's temporary workspace
-2. **Generates a bash script** named after the command with a case statement structure
-3. **Makes the script executable** (`chmod +x`)
-4. **Returns `this`** for method chaining
-
-The generated bash script uses pattern matching to respond to arguments:
-
-```bash
-#!/bin/bash
-case "$1" in
-  --version) echo "10.2.3" ;;
-  config)
-    case "$2 $3" in
-      "get prefix") echo "/usr/local" ;;
-      "get cache") echo "/tmp/npm-cache" ;;
-    esac
-    ;;
-esac
-```
-
-### PATH Manipulation
-
-To use the mocked command, prepend `$PWD/fake-bin` to the PATH:
+Set a fixed flag string appended to the script invocation. Replaces any
+prior `flags()` (does not accumulate).
 
 ```typescript
-// The fake binary takes precedence over system binaries
-script.env({ PATH: "$PWD/fake-bin:/usr/bin:/bin" });
+const result = hello.flags("--verbose").run("--name", "Alice");
 ```
 
-### Real-World Examples
+Generates: `run --separate-stderr "$SCRIPT" "--name" "Alice" --verbose`
 
-#### Package Manager Detection
+#### `mock(cmd: string, responses?: Record<string, string>): this`
+
+Register a recorder shim for `cmd`. Multiple `mock()` calls accumulate
+shims for different commands. See [Mocking](#mocking).
+
+### Termination
+
+#### `run(...args: string[]): BatsResult`
+
+Invoke the script as `"$SCRIPT" arg0 arg1 ...` (with current `env`,
+`flags`, and `mock` state). When coverage is enabled, the invocation is
+kcov-wrapped. State is reset in a `finally` block whether execution
+succeeds or throws.
 
 ```typescript
-helper.test("detects pnpm with full configuration", (script) => {
-  script.mock("pnpm", {
-    "--version": "9.5.0",
-    config: {
-      "get global-dir": "/home/user/.pnpm/global",
-      "get global-bin-dir": "/home/user/.pnpm",
-      "get store-dir": "/home/user/.pnpm-store"
-    },
-    store: {
-      "path": "/home/user/.pnpm-store"
-    }
-  });
-
-  script.env({ PATH: "$PWD/fake-bin:/usr/bin:/bin" });
-  script.assert_json_value("pnpm.available", true);
-  script.assert_json_value("pnpm.version", "9.5.0");
-  script.assert_json_value("pnpm.store_dir", "/home/user/.pnpm-store");
-});
+const result = hello.run();                       // "$SCRIPT"
+const result = hello.run("--name", "Alice");     // "$SCRIPT" "--name" "Alice"
 ```
 
-#### Git Operations
+#### `exec(shellExpr: string): BatsResult`
+
+Run `bash -c '<expr>'`. The same lifecycle as `run`, but the user controls
+what is executed. `$SCRIPT` is exported in `setup()` so it is available
+inside the expression. `exec()` is **not** kcov-wrapped -- coverage stops
+at the explicit shell boundary.
 
 ```typescript
-helper.test("mocks git status and branch", (script) => {
-  script.mock("git", {
-    "status": "On branch main\nnothing to commit",
-    "branch": "* main\n  feature/new-api",
-    "rev-parse": {
-      "--show-toplevel": "/home/user/project",
-      "HEAD": "abc123def456"
-    }
-  });
-
-  script.env({ PATH: "$PWD/fake-bin:/usr/bin:/bin" });
-  script.raw("run git status");
-  script.assert_output({ partial: "nothing to commit" });
-
-  script.env({ PATH: "$PWD/fake-bin:/usr/bin:/bin" });
-  script.raw("run git rev-parse --show-toplevel");
-  script.assert_output({ partial: "/home/user/project" });
-});
+const result = hello.exec('"$SCRIPT" --name Pipeline');
+const result = hello.exec('"$SCRIPT" | tr a-z A-Z');
+const result = hello.exec('echo "input" | "$SCRIPT"');
 ```
 
-#### Docker Commands
+Use `exec()` for pipelines, redirection, conditional logic, or anything
+that doesn't fit the simple `args` shape.
+
+## BatsResult
+
+`BatsResult` is a plain class returned by `run()` and `exec()`. It is
+**not** a Promise -- `await result` is harmless but resolves to the same
+instance per the JS Promise spec.
 
 ```typescript
-helper.test("mocks docker inspect", (script) => {
-  script.mock("docker", {
-    "version": "Docker version 24.0.0",
-    inspect: {
-      "container-name": '{"State": {"Running": true}}',
-      "image-name": '{"Config": {"Env": ["PATH=/usr/bin"]}}'
-    }
-  });
-
-  script.env({ PATH: "$PWD/fake-bin:/usr/bin:/bin" });
-  script.raw("run docker inspect container-name");
-  script.assert_json_value("State.Running", true);
-});
-```
-
-### Limitations
-
-* **Pattern Matching**: Uses bash case statements, which match `$1`, `$2 $3` patterns
-  * More complex argument parsing (flags in any order, long options with `=`) is not supported
-  * For complex scenarios, consider using `script.raw()` to create custom bash scripts
-* **Single Response**: Each pattern returns one static response
-  * Cannot simulate stateful behavior or different responses on repeated calls
-* **Positional Arguments**: Sub-commands match `$2 $3` as a single pattern
-  * `"get prefix"` matches when `$2="get"` and `$3="prefix"`
-
-### When to Use script.mock()
-
-✅ **Use `script.mock()`** when:
-
-* Testing scripts that call external CLI tools
-* You need controlled, predictable responses
-* Testing different versions or configurations
-* Simulating scenarios that are difficult to reproduce (errors, edge cases)
-* Isolating tests from external dependencies
-
-❌ **Don't use `script.mock()`** when:
-
-* Testing the actual implementation of the command itself
-* You need stateful behavior across multiple invocations
-* Complex argument parsing is required (use `script.raw()` instead)
-* The real command execution is fast and reliable
-
-## script.assert_json_value() - JSON Assertions
-
-### Purpose
-
-The `script.assert_json_value()` helper provides a clean, type-safe API for asserting specific values in JSON output using dot notation paths. It uses `jq` for reliable JSON parsing, avoiding the pitfalls of regex-based assertions on multiline JSON.
-
-### Signature
-
-```typescript
-script.assert_json_value(
-  path: string,
-  expected: string | number | boolean | null
-): this
-```
-
-### Parameters
-
-* **`path`** (string): Dot-separated path to the JSON field (e.g., `"user.name"`, `"config.settings.enabled"`)
-* **`expected`** (string | number | boolean | null): Expected value to assert
-
-### Supported Value Types
-
-| Type | Example | Notes |
-| ---- | ------- | ----- |
-| **String** | `"10.2.3"`, `"/usr/local"` | Any string value |
-| **Number** | `42`, `3.14`, `0` | Integers and floats |
-| **Boolean** | `true`, `false` | JSON boolean values |
-| **Null** | `null` | JSON null value |
-
-### Basic Usage
-
-```typescript
-helper.test("validates JSON output", (script) => {
-  script.flags("--json");
-  script.assert_success();
-
-  // Boolean assertions
-  script.assert_json_value("npm.available", true);
-  script.assert_json_value("pnpm.available", false);
-
-  // String assertions
-  script.assert_json_value("npm.version", "10.2.3");
-  script.assert_json_value("npm.path", "/usr/local/bin/npm");
-
-  // Number assertions
-  script.assert_json_value("summary.total_available", 2);
-  script.assert_json_value("summary.count", 0);
-
-  // Null assertions
-  script.assert_json_value("npm.config_file", null);
-  script.assert_json_value("error", null);
-});
-```
-
-### Path Notation
-
-Use dot notation to traverse nested JSON structures:
-
-```json
-{
-  "user": {
-    "name": "Alice",
-    "profile": {
-      "age": 30,
-      "active": true
-    }
-  },
-  "settings": {
-    "theme": null
-  }
+class BatsResult {
+  readonly status: number;
+  readonly output: string;
+  readonly stderr: string;
+  readonly lines: string[];          // output split on "\n"
+  readonly stderr_lines: string[];   // stderr split on "\n"
+  readonly calls: Record<string, MockCall[]>;
+  json<T = unknown>(): T;            // Lazy parse, cached
 }
 ```
 
-```typescript
-script.assert_json_value("user.name", "Alice");
-script.assert_json_value("user.profile.age", 30);
-script.assert_json_value("user.profile.active", true);
-script.assert_json_value("settings.theme", null);
-```
+Empty `output` produces `lines === []` (rather than `[""]`). Same for
+stderr. Stdout and stderr are captured separately via BATS 1.5+
+`run --separate-stderr`.
 
-### How It Works
+### `result.json<T>()`
 
-1. **Converts path to jq syntax**: `"npm.version"` → `".npm.version"`
-2. **Extracts the value** using `jq -r` (raw output mode)
-3. **Compares with expected** value using bash string comparison
-4. **Generates error message** showing expected vs actual on mismatch
-
-Generated bash code:
-
-```bash
-actual=$(echo "$output" | jq -r '.npm.version')
-if [ "$actual" != "10.2.3" ]; then
-  echo "Expected JSON path 'npm.version' to equal '10.2.3', got: $actual"
-  return 1
-fi
-```
-
-### Real-World Examples
-
-#### Package Manager Detection
+Lazily parses `output` as JSON and caches the parsed value via a `WeakMap`.
+Throws with a descriptive message if the output is not valid JSON.
 
 ```typescript
-helper.test("validates complete package manager info", (script) => {
-  script.mock("npm", {
-    "--version": "10.2.3",
-    config: {
-      "get prefix": "/usr/local",
-      "get cache": "/tmp/npm-cache"
-    }
-  });
+const data = result.json<{ greeting: string }>();
+expect(data.greeting).toBe("Hello World");
+```
 
-  script.env({ PATH: "$PWD/fake-bin:/usr/bin:/bin" });
-  script.flags("--json");
-  script.assert_success();
+### `result.calls`
 
-  // Validate npm object
-  script.assert_json_value("npm.available", true);
-  script.assert_json_value("npm.version", "10.2.3");
-  script.assert_json_value("npm.global_dir", "/usr/local/lib/node_modules");
-  script.assert_json_value("npm.global_bin_dir", "/usr/local/bin");
-  script.assert_json_value("npm.cache_dir", "/tmp/npm-cache");
-  script.assert_json_value("npm.config_file", null);
+Per-mock array of `MockCall` entries:
 
-  // Validate other package managers are not available
-  script.assert_json_value("pnpm.available", false);
-  script.assert_json_value("yarn.available", false);
-  script.assert_json_value("bun.available", false);
+```typescript
+interface MockCall {
+  args: string[];
+}
 
-  // Validate summary
-  script.assert_json_value("summary.any_package_manager_available", true);
-  script.assert_json_value("summary.total_available", 1);
-  script.assert_json_value("summary.preferred", "npm");
+result.calls; // { git: [{ args: ["remote", "get-url", "origin"] }] }
+```
+
+Empty when no `mock()` was registered for a given command.
+
+## Matchers
+
+23 Vitest matchers are registered via `expect.extend()` by the auto-injected
+setup file. Every matcher operates on a `BatsResult` (duck-typed for
+cross-build-entry compatibility, not `instanceof`).
+
+### Status
+
+| Matcher | Asserts |
+| --- | --- |
+| `toSucceed()` | `result.status === 0` |
+| `toFail(code?)` | `result.status !== 0`, or `=== code` if given |
+
+```typescript
+expect(result).toSucceed();
+expect(result).toFail();
+expect(result).toFail(2);
+```
+
+### Output (stdout)
+
+| Matcher | Asserts |
+| --- | --- |
+| `toHaveOutput(text)` | `output === text` |
+| `toContainOutput(text)` | `output.includes(text)` |
+| `toMatchOutput(pattern)` | RegExp test |
+| `toHaveEmptyOutput()` | `output === ""` |
+
+```typescript
+expect(result).toHaveOutput("Hello World\n");
+expect(result).toContainOutput("Hello");
+expect(result).toMatchOutput(/^Hello/);
+expect(result).toHaveEmptyOutput();
+```
+
+### Stderr
+
+| Matcher | Asserts |
+| --- | --- |
+| `toHaveStderr(text)` | `stderr === text` |
+| `toContainStderr(text)` | `stderr.includes(text)` |
+| `toMatchStderr(pattern)` | RegExp test |
+
+```typescript
+expect(result).toContainStderr("Unknown option");
+expect(result).toMatchStderr(/Error: .*/);
+```
+
+### Lines
+
+| Matcher | Asserts |
+| --- | --- |
+| `toHaveLine(index, text)` | `lines[index] === text` |
+| `toHaveLineContaining(text, index?)` | line at `index` contains `text`, or any line if omitted |
+| `toHaveLineMatching(pattern, index?)` | same shape, RegExp |
+| `toHaveLineCount(n)` | `lines.length === n` |
+
+```typescript
+expect(result).toHaveLine(0, "Hello World");
+expect(result).toHaveLineContaining("World");           // any line
+expect(result).toHaveLineContaining("World", 0);        // line 0 only
+expect(result).toHaveLineMatching(/^\[DEBUG/);
+expect(result).toHaveLineCount(3);
+```
+
+### JSON
+
+| Matcher | Asserts |
+| --- | --- |
+| `toOutputJson()` | `result.json()` doesn't throw |
+| `toEqualJson(expected)` | parsed JSON deep-equals `expected` |
+| `toMatchJson(partial)` | `partial` is a deep subset of parsed JSON |
+| `toHaveJsonValue(path, expected)` | path exists and deep-equals `expected` |
+| `toHaveJsonPath(path)` | path exists |
+
+Path syntax: dots for keys, brackets for array indices.
+
+```typescript
+expect(result).toOutputJson();
+expect(result).toEqualJson({ greeting: "Hello World" });
+expect(result).toMatchJson({ greeting: "Hello World" });   // ignores extra keys
+expect(result).toHaveJsonValue("greeting", "Hello World");
+expect(result).toHaveJsonValue("users[0].name", "Alice");
+expect(result).toHaveJsonPath("settings.theme");
+```
+
+`toMatchJson` performs a structural subset check -- the actual JSON may
+contain additional keys or array elements not present in `partial`.
+`toEqualJson` requires exact deep equality.
+
+### Schema
+
+| Matcher | Asserts |
+| --- | --- |
+| `toMatchSchema(schema)` | Standard Schema **or** raw JSON Schema validates parsed JSON |
+| `toMatchJsonSchema(schema)` | raw JSON Schema validates parsed JSON |
+
+`toMatchSchema` auto-detects Standard Schema (Zod, Valibot, Arktype, Effect
+Schema) by the `~standard` property on the value. Plain objects are treated
+as raw JSON Schema and compiled via Ajv. See
+[Schema Validation](#schema-validation).
+
+### Invocation (mock calls)
+
+| Matcher | Asserts |
+| --- | --- |
+| `toHaveInvoked(cmd, opts?)` | `cmd` was invoked at least once; if `opts.args` given, at least one call matches |
+| `toHaveInvokedTimes(cmd, n)` | `result.calls[cmd].length === n` |
+| `toHaveInvokedExactly(cmd, calls)` | `result.calls[cmd]` deep-equals the given list (order-sensitive) |
+
+```typescript
+expect(result).toHaveInvoked("git");
+expect(result).toHaveInvoked("git", { args: ["remote", "get-url", "origin"] });
+expect(result).toHaveInvokedTimes("widget-cli", 3);
+expect(result).toHaveInvokedExactly("widget-cli", [
+  { args: ["init"] },
+  { args: ["build", "--target=foo"] },
+  { args: ["ship", "release"] },
+]);
+```
+
+> Strict-count matchers can be flaky when kcov is enabled and the
+> instrumented script invokes binaries kcov uses internally
+> (e.g., `git rev-parse` during instrumentation). For reliable strict-count
+> assertions, mock binaries kcov never touches.
+
+## Schema Validation
+
+`vitest-bats` accepts both Standard Schema validators and raw JSON Schema.
+
+### Standard Schema (Zod, Valibot, Arktype, Effect Schema)
+
+Pass any value implementing the
+[Standard Schema](https://github.com/standard-schema/standard-schema)
+specification:
+
+```typescript
+import { z } from "zod";
+
+const HookSchema = z.object({
+  decision: z.enum(["approve", "block"]),
+  reason: z.string(),
+});
+
+test("hook.sh emits a valid response", () => {
+  const result = hook.run();
+  expect(result).toSucceed();
+  expect(result).toMatchSchema(HookSchema);
 });
 ```
 
-#### Configuration Validation
+Async validators throw with a clear migration message -- `toMatchSchema`
+is synchronous. If you need async validation, parse `result.json()` and
+assert directly:
 
 ```typescript
-helper.test("validates configuration structure", (script) => {
-  script.flags("--export-config");
-  script.assert_success();
+const data = result.json();
+const parsed = await asyncSchema.parseAsync(data);
+expect(parsed).toMatchObject({ ... });
+```
 
-  // Validate config structure
-  script.assert_json_value("version", "1.0.0");
-  script.assert_json_value("settings.debug", false);
-  script.assert_json_value("settings.verbosity", 2);
-  script.assert_json_value("paths.root", "/app");
-  script.assert_json_value("features.experimental", null);
+### Raw JSON Schema
+
+Plain JSON Schema objects are compiled via
+[Ajv](https://ajv.js.org/) (`strict: false`, `allErrors: true`) with
+[`ajv-formats`](https://github.com/ajv-validator/ajv-formats) enabled.
+Compiled validators are cached in a `WeakMap`.
+
+```typescript
+const HookJsonSchema = {
+  type: "object",
+  properties: {
+    decision: { type: "string", enum: ["approve", "block"] },
+    reason: { type: "string" },
+  },
+  required: ["decision", "reason"],
+} as const;
+
+test("hook.sh matches JSON Schema", () => {
+  const result = hook.run();
+  expect(result).toSucceed();
+  expect(result).toMatchJsonSchema(HookJsonSchema);
 });
 ```
 
-#### Error Handling
+`toMatchSchema` accepts both flavors; `toMatchJsonSchema` always treats
+the schema as raw JSON Schema.
+
+## Mocking
+
+`mock(cmd, responses?)` registers a shim binary that intercepts calls to
+`cmd` while the script under test runs. The shim records every invocation
+to a `calls.jsonl` file (read back into `result.calls`) and dispatches
+responses by matching argv against bash globs derived from the user's
+patterns.
+
+### Basic Usage
 
 ```typescript
-helper.test("handles errors gracefully", (script) => {
-  script.env({ PATH: "/usr/bin:/bin" });
-  script.flags("--json");
-  script.assert_success(); // Script exits 0 but reports errors
+import gitScript from "../../scripts/uses-git.sh";
 
-  script.assert_json_value("status", "error");
-  script.assert_json_value("error.code", 404);
-  script.assert_json_value("error.message", "Command not found");
-  script.assert_json_value("error.recoverable", true);
+test("records git invocation", () => {
+  const result = gitScript
+    .mock("git", { "remote get-url *": "echo https://example.com" })
+    .run();
+
+  expect(result).toSucceed();
+  expect(result).toContainOutput("https://example.com");
+  expect(result).toHaveInvoked("git", { args: ["remote", "get-url", "origin"] });
 });
 ```
 
-### Comparison with Other Assertion Methods
+### Pattern Syntax
 
-#### vs. `script.assert_output({ regexp })`
+Patterns are matched against the full `$*` (space-joined argv) of the
+shim invocation. They are converted to bash globs by the BATS generator:
 
-**Before** (regex - fragile with multiline JSON):
+- Literal segments (no glob characters) are double-quoted in the generated
+  bash, so they match exactly.
+- `*`, `?`, `[`, `]` stay unquoted and active.
 
-```typescript
-script.assert_output({ regexp: '"npm".*"available": true' });
-script.assert_output({ regexp: '"npm".*"version": "10.2.3"' });
-```
+| Pattern | Matches |
+| --- | --- |
+| `"--version"` | `--version` |
+| `"remote get-url *"` | `remote get-url <anything>` |
+| `"build --target=*"` | `build --target=foo`, `build --target=bar`, ... |
+| `"ship *"` | `ship release with spaces` (entire trailing argv) |
 
-**Problems**:
-
-* `.*` doesn't match newlines in standard grep
-* Matches anywhere in output (false positives)
-* No type checking (could match `"available": "true"` as string)
-* Poor error messages
-
-**After** (`assert_json_value` - reliable):
+Responses are evaluated by bash `eval`, so they can include any expression:
 
 ```typescript
-script.assert_json_value("npm.available", true);
-script.assert_json_value("npm.version", "10.2.3");
+script.mock("clock", { "now": "echo 1700000000" });
+script.mock("env-tool", { "show": 'echo "PATH=$PATH"' });
 ```
 
-**Benefits**:
-
-* ✅ Proper JSON parsing with `jq`
-* ✅ Type-safe comparisons
-* ✅ Clear error messages: `Expected JSON path 'npm.version' to equal '10.2.3', got: 9.0.0`
-* ✅ Works with any JSON formatting
-
-#### vs. `script.assert_output({ partial })`
-
-**Use `assert_json_value`** when:
-
-* Testing JSON output
-* Need exact value matching
-* Type matters (boolean vs string)
-
-**Use `partial`** when:
-
-* Testing non-JSON output
-* Need substring matching
-* Testing formatted/pretty output
+### Multiple Patterns
 
 ```typescript
-// JSON output - use assert_json_value
-script.assert_json_value("status", "success");
+const result = widget
+  .mock("widget-cli", {
+    init: "echo initialized",
+    "build --target=*": "echo built",
+    "ship *": "echo shipped",
+  })
+  .run();
 
-// Pretty output - use partial
-script.assert_output({ partial: "✅ Success" });
-
-// Log messages - use partial
-script.assert_output({ partial: "Processing file: data.json" });
+expect(result).toHaveInvokedExactly("widget-cli", [
+  { args: ["init"] },
+  { args: ["build", "--target=foo"] },
+  { args: ["ship", "release with spaces"] },
+]);
 ```
 
-### Error Messages
+### Multiple Commands
 
-When assertions fail, you get clear, actionable error messages:
+Each `mock()` call registers a separate shim. Calls accumulate:
 
-```bash
-# String mismatch
-Expected JSON path 'npm.version' to equal '10.2.3', got: 9.5.0
-
-# Type mismatch
-Expected JSON path 'npm.available' to equal 'true', got: false
-
-# Null vs value
-Expected JSON path 'error' to equal 'null', got: Command not found
-
-# Missing field
-Expected JSON path 'npm.config_file' to equal 'null', got: null
+```typescript
+const result = script
+  .mock("git", { "rev-parse --show-toplevel": "echo /repo" })
+  .mock("docker", { "version": "echo 'Docker version 24.0.0'" })
+  .run();
 ```
 
-### Limitations
+### Recording Without Responding
 
-* **Dot notation only**: Does not support array indices (e.g., `items[0].name`)
-  * Use `jq` directly via `script.raw()` for array access
-* **Flat path syntax**: Cannot handle keys with dots in their names
-  * Use `jq` with bracket notation for keys like `"my.key"`: `script.raw('[ "$(echo "$output" | jq -r ".[\\"my.key\\"]")" = "value" ]')`
-* **String comparison**: All values are compared as strings after `jq -r` extraction
-  * This usually works correctly but may have edge cases with special characters
+Pass an empty `responses` object to record calls without producing output.
+The shim still exits 0:
 
-### When to Use script.assert_json_value()
+```typescript
+const result = script.mock("audit-log", {}).run();
+expect(result).toHaveInvokedTimes("audit-log", 1);
+```
 
-✅ **Use `script.assert_json_value()`** when:
+### No Match Behavior
 
-* Script outputs JSON
-* Testing specific field values
-* Need exact value matching
-* Type-safe assertions matter
-* Clear error messages are important
+If no pattern matches at runtime, the shim emits an error to stderr and
+exits 1:
 
-❌ **Don't use `script.assert_json_value()`** when:
+```text
+vitest-bats: no mock pattern matched for git: status --short
+```
 
-* Output is not JSON
-* Testing output format/structure (use `partial` or `regexp`)
-* Need array access (use `script.raw()` with custom `jq`)
-* Testing pretty/formatted output
+This makes missed cases visible. Add the missing pattern, or use a
+catch-all `"*"`:
+
+```typescript
+script.mock("git", { "*": "echo ''" });   // match everything, no output
+```
+
+### Why Not bats-mock?
+
+`vitest-bats` does not use `bats-mock` at runtime. Recorder shims are
+embedded directly into the generated `.bats` file. This:
+
+- Avoids a hard runtime dependency on `bats-mock`'s `binstub` (unreliable
+  under kcov instrumentation due to ptrace + `set -e` interaction).
+- Means the mocked binary need not exist on the host system.
+- Captures structured `MockCall` entries directly into the result.
+
+`bats-mock` is still detected at startup for compatibility warnings, but
+not loaded at runtime.
 
 ## Advanced Usage
 
-### Combining Mock and JSON Assertions
+### Combining Mocks with Schema Validation
 
 ```typescript
-helper.test("complete integration test", (script) => {
-  // Mock multiple package managers
-  script.mock("npm", {
-    "--version": "10.2.3",
-    config: {
-      "get prefix": "/usr/local",
-      "get cache": "/tmp/npm-cache"
-    }
+test("emits valid status JSON when git is mocked", () => {
+  const result = statusScript
+    .mock("git", { "rev-parse --abbrev-ref HEAD": "echo main" })
+    .run("--json");
+
+  expect(result).toSucceed();
+  expect(result).toMatchJsonSchema({
+    type: "object",
+    properties: {
+      branch: { type: "string" },
+      clean: { type: "boolean" },
+    },
+    required: ["branch"],
   });
-
-  script.mock("pnpm", {
-    "--version": "9.5.0",
-    config: {
-      "get global-dir": "/home/user/.pnpm/global",
-      "get store-dir": "/home/user/.pnpm-store"
-    }
-  });
-
-  // Run script with mocked commands in PATH
-  script.env({ PATH: "$PWD/fake-bin:/usr/bin:/bin" });
-  script.flags("--json");
-  script.assert_success();
-
-  // Validate JSON output with precise assertions
-  script.assert_json_value("npm.available", true);
-  script.assert_json_value("npm.version", "10.2.3");
-  script.assert_json_value("pnpm.available", true);
-  script.assert_json_value("pnpm.version", "9.5.0");
-  script.assert_json_value("summary.total_available", 2);
-  script.assert_json_value("summary.preferred", "npm"); // npm preferred over pnpm
 });
 ```
 
-### Testing Error Scenarios
+### Typed JSON Access
+
+`result.json<T>()` is generic. For strongly-typed access:
 
 ```typescript
-helper.test("handles invalid version format", (script) => {
-  // Mock command with unexpected output
-  script.mock("myapp", {
-    "--version": "invalid-version-string"
-  });
+interface HookResponse {
+  decision: "approve" | "block";
+  reason: string;
+}
 
-  script.env({ PATH: "$PWD/fake-bin:/usr/bin:/bin" });
-  script.flags("--json");
-  script.assert_success(); // Script doesn't crash
-
-  // Validate error is reported
-  script.assert_json_value("myapp.available", true);
-  script.assert_json_value("myapp.version", null);
-  script.assert_json_value("error.message", "Could not parse version");
+test("typed JSON access", () => {
+  const result = hook.run("--decision", "block", "--reason", "policy");
+  const data = result.json<HookResponse>();
+  expect(data.decision).toBe("block");
+  expect(data.reason).toBe("policy");
 });
 ```
 
-### Testing Multiple Configurations
+### Pipelines via `exec()`
+
+`run()` invokes the script as `"$SCRIPT" args...`. For anything that needs
+shell evaluation -- pipelines, redirects, conditionals -- use `exec()`:
 
 ```typescript
-helper.test("detects yarn v1", (script) => {
-  script.mock("yarn", {
-    "--version": "1.22.19",
-    global: { dir: "/usr/local/yarn" }
-  });
-
-  script.env({ PATH: "$PWD/fake-bin:/usr/bin:/bin" });
-  script.flags("--json");
-  script.assert_json_value("yarn.major_version", "1");
+test("pipes stdin through the script", () => {
+  const result = hello.exec('"$SCRIPT" | tr a-z A-Z');
+  expect(result).toSucceed();
+  expect(result).toContainOutput("HELLO WORLD");
 });
 
-helper.test("detects yarn v2+", (script) => {
-  script.mock("yarn", {
-    "--version": "4.0.2",
-    config: {
-      "get globalFolder": "/home/user/.yarn/berry"
-    }
-  });
-
-  script.env({ PATH: "$PWD/fake-bin:/usr/bin:/bin" });
-  script.flags("--json");
-  script.assert_json_value("yarn.major_version", "2+");
+test("respects shell-level redirection", () => {
+  const result = hello.exec('"$SCRIPT" --json > /tmp/out.json && cat /tmp/out.json');
+  expect(result).toSucceed();
+  expect(result).toOutputJson();
 });
 ```
 
-### Custom JSON Paths
-
-For complex JSON structures with deeply nested values:
-
-```typescript
-helper.test("validates nested configuration", (script) => {
-  script.flags("--export-config");
-
-  // Deep nesting
-  script.assert_json_value("server.database.connection.host", "localhost");
-  script.assert_json_value("server.database.connection.port", 5432);
-  script.assert_json_value("server.database.connection.ssl", true);
-
-  // Multiple levels
-  script.assert_json_value("features.experimental.newApi.enabled", false);
-  script.assert_json_value("features.experimental.newApi.version", "0.1.0");
-});
-```
+`exec()` is not kcov-wrapped -- the user controls what runs.
 
 ## Best Practices
 
-### 1. Use Meaningful Test Names
+### 1. Use Specific Matchers Over Output Substring Checks
 
 ```typescript
-// ✅ Good - describes what is being tested
-helper.test("detects npm when installed with valid version", (script) => {
+// Good - structural and type-safe
+expect(result).toHaveJsonValue("count", 5);
+expect(result).toMatchSchema(StatusSchema);
 
-// ❌ Bad - vague or implementation-focused
-helper.test("test npm detection", (script) => {
-helper.test("calls npm --version", (script) => {
+// Avoid - false positives, fragile against formatting changes
+expect(result).toContainOutput('"count": 5');
 ```
 
-### 2. Group Related Assertions
+### 2. Mock Realistically
 
 ```typescript
-helper.test("validates complete npm configuration", (script) => {
-  script.mock("npm", {
-    "--version": "10.2.3",
-    config: {
-      "get prefix": "/usr/local",
-      "get cache": "/tmp/npm-cache"
-    }
-  });
+// Good - realistic versions and paths
+script.mock("npm", { "--version": "10.2.3" });
 
-  script.env({ PATH: "$PWD/fake-bin:/usr/bin:/bin" });
-  script.flags("--json");
-  script.assert_success();
-
-  // Group by logical sections
-  // Basic properties
-  script.assert_json_value("npm.available", true);
-  script.assert_json_value("npm.version", "10.2.3");
-
-  // Paths
-  script.assert_json_value("npm.global_bin_dir", "/usr/local/bin");
-  script.assert_json_value("npm.cache_dir", "/tmp/npm-cache");
-
-  // Config
-  script.assert_json_value("npm.config_file", null);
-});
+// Avoid - sentinel values that hide bugs
+script.mock("npm", { "--version": "999.999.999" });
 ```
 
-### 3. Test Both Success and Failure Cases
+### 3. Prefer `run(...)` over `exec(...)` When Possible
+
+`run(...)` is kcov-wrapped (when coverage is enabled) and quotes args
+correctly. Reach for `exec()` only when you need shell features:
 
 ```typescript
-helper.test("reports npm as available when found", (script) => {
-  script.mock("npm", { "--version": "10.0.0" });
-  script.env({ PATH: "$PWD/fake-bin:/usr/bin:/bin" });
-  script.flags("--json");
-  script.assert_json_value("npm.available", true);
-});
+// Prefer
+const result = script.run("--name", "Alice", "--json");
 
-helper.test("reports npm as unavailable when not in PATH", (script) => {
-  script.env({ PATH: "/usr/bin:/bin" });
-  script.flags("--json");
-  script.assert_json_value("npm.available", false);
-  script.assert_json_value("npm.version", null);
-});
+// When you need a pipe or redirect
+const result = script.exec('"$SCRIPT" --json | jq .greeting');
 ```
 
-### 4. Use Specific Assertions
+### 4. Reset Builder State Between Configurations
+
+State is reset automatically after every `run()` / `exec()` and again
+before each test. Within a single test, the second termination starts
+fresh:
 
 ```typescript
-// ✅ Good - specific and clear
-script.assert_json_value("status", "success");
-script.assert_json_value("count", 5);
+test("two invocations", () => {
+  const first = script.env({ MODE: "a" }).run();
+  expect(first).toSucceed();
 
-// ❌ Bad - too broad, could match unintended output
-script.assert_output({ partial: "success" }); // Could match "unsuccessful"
-script.assert_output({ regexp: "count.*5" }); // Could match "countdown: 5"
+  // env({ MODE: "a" }) is no longer set here
+  const second = script.run();
+  expect(second).toSucceed();
+});
 ```
 
-### 5. Mock Realistically
+If you want shared configuration across multiple terminations within a
+single test, re-apply it:
 
 ```typescript
-// ✅ Good - realistic versions and paths
-script.mock("npm", {
-  "--version": "10.2.3",
-  config: {
-    "get prefix": "/usr/local",
-    "get cache": "/home/user/.npm"
-  }
-});
+test("with shared env", () => {
+  const env = { TZ: "UTC" };
 
-// ❌ Bad - unrealistic values that might hide bugs
-script.mock("npm", {
-  "--version": "999.999.999",
-  config: {
-    "get prefix": "/fake/path/that/doesnt/exist"
-  }
+  const first = script.env(env).run("--time");
+  const second = script.env(env).run("--date");
 });
 ```
 
-### 6. Keep Tests Independent
+### 5. Mock Binaries kcov Never Touches for Strict-Count Assertions
+
+When coverage is on, kcov instrumentation may invoke binaries (notably
+`git rev-parse`). Those invocations flow through your recorder shim and
+inflate counts. For reliable strict-count assertions, mock binaries kcov
+has no reason to invoke.
 
 ```typescript
-// ✅ Good - each test is self-contained
-helper.test("test A", (script) => {
-  script.mock("cmd", { "--flag": "value1" });
-  # run() called implicitly
-});
+// Flaky under coverage - kcov may invoke git internally
+expect(result).toHaveInvokedTimes("git", 1);
 
-helper.test("test B", (script) => {
-  script.mock("cmd", { "--flag": "value2" });
-  # run() called implicitly
-});
-
-// ❌ Bad - tests depend on shared state
-let sharedMock;
-helper.test("test A", (script) => {
-  sharedMock = { "--flag": "value1" };
-  // ...
-});
-```
-
-### 7. Document Complex Mocks
-
-```typescript
-helper.test("handles corepack-managed yarn", (script) => {
-  // Yarn v1 uses 'global' and 'cache' commands
-  // Yarn v2+ uses 'config get' commands
-  // This mocks Yarn v1.22.19 with classic structure
-  script.mock("yarn", {
-    "--version": "1.22.19",
-    global: {
-      dir: "/usr/local/yarn/global",
-      bin: "/usr/local/bin"
-    },
-    cache: {
-      dir: "/tmp/yarn-cache"
-    }
-  });
-
-  // COREPACK_ENABLE_STRICT=0 prevents corepack from managing yarn
-  script.env({ PATH: "$PWD/fake-bin:/usr/bin:/bin", COREPACK_ENABLE_STRICT: "0" });
-  script.assert_json_value("yarn.major_version", "1");
-});
-```
-
-## Implementation Details
-
-### Generated Bash Scripts
-
-When you call `script.mock("npm", config)`, the helper generates a bash script at `fake-bin/npm`:
-
-```bash
-#!/bin/bash
-case "$1" in
-  --version) echo "10.2.3" ;;
-  config)
-    case "$2 $3" in
-      "get prefix") echo "/usr/local" ;;
-      "get cache") echo "/tmp/npm-cache" ;;
-    esac
-    ;;
-esac
-```
-
-**Key points**:
-
-* Uses POSIX-compliant bash
-* Simple case statement pattern matching
-* No state between invocations
-* Fast execution (no actual command logic)
-
-### JSON Assertion Implementation
-
-The `script.assert_json_value()` method generates bash code that:
-
-1. Extracts the value using `jq -r` (raw mode, unquoted strings)
-2. Compares using bash string comparison `[ "$actual" != "expected" ]`
-3. Returns error code 1 with descriptive message on mismatch
-
-```bash
-actual=$(echo "$output" | jq -r '.npm.version')
-if [ "$actual" != "10.2.3" ]; then
-  echo "Expected JSON path 'npm.version' to equal '10.2.3', got: $actual"
-  return 1
-fi
-```
-
-**Why `jq -r`?**
-
-* Removes JSON quotes from strings (`"value"` → `value`)
-* Outputs `true`/`false`/`null` as literal strings
-* Consistent format for bash string comparison
-
-### TypeScript to BATS Translation
-
-The fluent API calls are translated to BATS test code:
-
-```typescript
-// TypeScript
-helper.test("validates npm", (script) => {
-  script.mock("npm", { "--version": "10.2.3" });
-  script.env({ PATH: "$PWD/fake-bin:/usr/bin:/bin" });
-  script.assert_success();
-  script.assert_json_value("npm.version", "10.2.3");
-});
-```
-
-```bash
-# Generated BATS
-@test "validates npm" {
-  mkdir -p fake-bin
-  cat > fake-bin/npm <<'EOF'
-#!/bin/bash
-case "$1" in
-  --version) echo "10.2.3" ;;
-esac
-EOF
-  chmod +x fake-bin/npm
-  run env PATH="$PWD/fake-bin:/usr/bin:/bin" "$SCRIPT"
-  assert_success
-  actual=$(echo "$output" | jq -r '.npm.version')
-  if [ "$actual" != "10.2.3" ]; then
-    echo "Expected JSON path 'npm.version' to equal '10.2.3', got: $actual"
-    return 1
-  fi
-}
+// Reliable - widget-cli is fictional
+expect(result).toHaveInvokedTimes("widget-cli", 3);
 ```
 
 ## Troubleshooting
 
-### script.mock() Issues
+### `Cannot find module '../scripts/hello.sh'`
 
-#### Mock Not Being Used
+TypeScript needs the `.sh` module declaration. Add `"vitest-bats"` to
+`tsconfig.json` `compilerOptions.types`:
 
-**Problem**: Script still uses system command instead of mock.
-
-**Solution**: Ensure `fake-bin` is first in PATH:
-
-```typescript
-// ✅ Correct - fake-bin first
-script.env({ PATH: "$PWD/fake-bin:/usr/bin:/bin" });
-
-// ❌ Wrong - system paths first
-script.env({ PATH: "/usr/bin:$PWD/fake-bin:/bin" });
+```json
+{
+  "compilerOptions": {
+    "types": ["vitest-bats"]
+  }
+}
 ```
 
-#### Mock Not Responding to Arguments
+### "BATS version 1.4 is too old"
 
-**Problem**: Mock returns no output for specific arguments.
+`run --separate-stderr` requires BATS 1.5+. Upgrade your BATS install.
 
-**Debug**:
+### Mock Not Being Used
 
-1. Check the generated `.bats` file in `.cache/`
-2. Verify the case statement pattern matches your usage
-3. Test the mock directly:
+The recorder shim is on `PATH` at `$VBATS_RECORDER/bin` for the duration
+of the BATS test. If the script invokes the command via an absolute path
+(e.g., `/usr/bin/git`), the shim is bypassed. Make sure scripts use
+unqualified command names.
 
-   ```typescript
-   script.raw('./fake-bin/npm --version'); // Should output expected value
-   ```
+### `toHaveInvokedTimes` Off by One Under Coverage
 
-**Common issues**:
+kcov may invoke `git rev-parse` (or similar) internally during
+instrumentation, and those calls go through your shim. Mock binaries
+kcov never touches for strict-count assertions.
 
-* Case sensitivity: `--Version` vs `--version`
-* Extra whitespace: `"get  prefix"` vs `"get prefix"`
-* Argument order: Config expects `$2 $3` pattern
+### `result.json()` Throws
 
-#### Mock Script Not Executable
-
-**Problem**: Permission denied when running mock.
-
-**Solution**: This should never happen (automatic `chmod +x`), but verify:
+Verify the script outputs valid JSON. Print `result.output` to debug:
 
 ```typescript
-script.raw('[ -x fake-bin/npm ]'); // Should pass
+console.log(JSON.stringify(result.output));
 ```
 
-### script.assert_json_value() Issues
+Common causes: a trailing newline followed by a debug log to stdout, an
+empty body, or partial output truncation.
 
-#### "jq: command not found"
+### Schema Validation Fails Unexpectedly
 
-**Problem**: `jq` is not installed in the test environment.
-
-**Solution**:
-
-* **Docker**: Ensure `jq` is in the Docker image (it's included in `Dockerfile.test`)
-* **Local**: Install `jq`: `brew install jq` (macOS) or `apt-get install jq` (Linux)
-
-#### Assertion Fails with Correct Value
-
-**Problem**: Test shows correct value but still fails.
-
-**Common causes**:
-
-1. **Whitespace differences**:
-
-   ```bash
-   Expected: "10.2.3"
-   Got: "10.2.3 " # Trailing space
-   ```
-
-2. **Type mismatch**:
-
-   ```bash
-   Expected: "true" (boolean)
-   Got: "\"true\"" (string) # Script outputs JSON string instead of boolean
-   ```
-
-3. **JSON path incorrect**:
-
-   ```bash
-   Expected path: 'npm.version'
-   Actual path in JSON: 'npm.ver' # Typo in script output
-   ```
-
-**Debug**:
+`toMatchSchema` accepts both Standard Schema and raw JSON Schema. If you
+pass a Zod schema and validation fails with cryptic messages, inspect the
+parsed value:
 
 ```typescript
-// Add raw output check
-script.raw('echo "$output"'); // Prints JSON to test output
-script.raw('echo "$output" | jq .npm.version'); // Shows what jq extracts
+const result = script.run();
+console.log(result.json());
+expect(result).toMatchSchema(MySchema);
 ```
 
-#### Path with Dots Not Working
+## See Also
 
-**Problem**: JSON key contains a dot (e.g., `"my.key": "value"`).
-
-**Solution**: Use custom `jq` with bracket notation:
-
-```typescript
-// Instead of this (won't work):
-script.assert_json_value("my.key", "value");
-
-// Use this:
-script.raw('actual=$(echo "$output" | jq -r ".[\\"my.key\\"]")');
-script.raw('[ "$actual" = "value" ]');
-```
-
-#### Array Access Not Supported
-
-**Problem**: Need to assert array element value.
-
-**Solution**: Use custom `jq` query:
-
-```typescript
-// JSON: {"items": [{"name": "first"}, {"name": "second"}]}
-
-// Instead of this (not supported):
-script.assert_json_value("items[0].name", "first");
-
-// Use this:
-script.raw('actual=$(echo "$output" | jq -r ".items[0].name")');
-script.raw('[ "$actual" = "first" ]');
-
-// Or create a custom helper:
-script.raw('count=$(echo "$output" | jq ".items | length")');
-script.raw('[ "$count" = "2" ]');
-```
-
-### General Test Issues
-
-#### Tests Pass Locally, Fail in Docker
-
-**Problem**: Different environments have different behavior.
-
-**Common causes**:
-
-* Different default PATH values
-* Different HOME directory locations
-* Different temporary directory locations
-
-**Solution**: Use environment variables consistently:
-
-```typescript
-// Use $HOME, $PWD, not hardcoded paths
-script.raw('mkdir -p "$HOME/.config"');
-script.raw('cd "$PWD/workspace"');
-
-// Not: mkdir -p /root/.config
-```
-
-#### Test Output Shows Wrong JSON
-
-**Problem**: `$output` variable contains unexpected JSON.
-
-**Debug steps**:
-
-1. Print the actual output:
-
-   ```typescript
-   script.raw('echo "=== OUTPUT START ==="');
-   script.raw('echo "$output"');
-   script.raw('echo "=== OUTPUT END ==="');
-   ```
-
-2. Check if output is valid JSON:
-
-   ```typescript
-   script.raw('echo "$output" | jq . > /dev/null 2>&1 || echo "Invalid JSON"');
-   ```
-
-3. Verify command execution:
-
-   ```typescript
-   script.raw('echo "Exit code: $status"');
-   ```
-
-#### Mock Persists Across Tests
-
-**Problem**: Mock from one test affects another test.
-
-**Solution**: This shouldn't happen - each test gets its own `$TEST_DIR` with fresh `fake-bin/`. If it does:
-
-1. Check that tests are truly independent (no shared state)
-2. Verify `teardown()` is cleaning up properly
-3. Check for environment variable pollution
-
-## Additional Resources
-
-* [Non-Executable Scripts](non-executable-scripts.md) -- Testing scripts without
-  the executable bit
-* [Docker Coverage](docker-coverage.md) -- Running kcov in Docker
-* [BatsHelper source](../package/src/vitest-kcov-bats-helper.ts) -- Implementation
-  details
-* [BATS documentation](https://bats-core.readthedocs.io/) -- BATS framework
+- [Non-Executable Scripts](non-executable-scripts.md) -- testing scripts
+  without the executable bit
+- [Docker Coverage](docker-coverage.md) -- running kcov in Docker
+- [BATS documentation](https://bats-core.readthedocs.io/) -- BATS framework
   reference
-* [jq documentation](https://stedolan.github.io/jq/) -- jq command-line JSON
-  processor
-
-## Contributing
-
-When adding new testing helpers:
-
-1. **Add to BatsHelper class** in `package/src/vitest-kcov-bats-helper.ts`
-2. **Return `this`** for method chaining
-3. **Generate POSIX-compliant bash** (avoid bash-specific features when possible)
-4. **Add comprehensive documentation** with examples
-5. **Create example tests** demonstrating usage
-6. **Update this document** with the new helper's API reference
+- [Standard Schema](https://github.com/standard-schema/standard-schema) --
+  schema validator interoperability spec
 
 ## License
 
-MIT
+[MIT](../LICENSE)
