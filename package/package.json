@@ -36,11 +36,11 @@
 		"@standard-schema/spec": "^1.1.0",
 		"ajv": "^8.20.0",
 		"ajv-formats": "^3.0.1",
-		"fast-xml-parser": "^5.7.2",
+		"fast-xml-parser": "^5.8.0",
 		"minimatch": "^10.2.5"
 	},
 	"devDependencies": {
-		"@savvy-web/rslib-builder": "^0.20.3",
+		"@savvy-web/rslib-builder": "^0.20.7",
 		"@types/node": "catalog:silk",
 		"@typescript/native-preview": "catalog:silk",
 		"tsx": "catalog:silk",
