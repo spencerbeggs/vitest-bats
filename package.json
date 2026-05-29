@@ -48,7 +48,7 @@
 	},
 	"devDependencies": {
 		"@savvy-web/changesets": "^0.10.0",
-		"@savvy-web/commitlint": "^0.9.1",
+		"@savvy-web/commitlint": "^0.10.0",
 		"@savvy-web/lint-staged": "^1.1.0",
 		"@savvy-web/vitest": "^1.3.2",
 		"vitest": "^4.1.5",
