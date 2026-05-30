@@ -40,7 +40,7 @@
 		"minimatch": "^10.2.5"
 	},
 	"devDependencies": {
-		"@savvy-web/rslib-builder": "^0.20.8",
+		"@savvy-web/rslib-builder": "^0.20.11",
 		"@types/node": "catalog:silk",
 		"@typescript/native-preview": "catalog:silk",
 		"tsx": "catalog:silk",
