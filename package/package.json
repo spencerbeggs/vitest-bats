@@ -40,12 +40,12 @@
 		"minimatch": "^10.2.5"
 	},
 	"devDependencies": {
-		"@savvy-web/rslib-builder": "^0.20.11",
+		"@savvy-web/rslib-builder": "^0.20.12",
 		"@types/node": "catalog:silk",
 		"@typescript/native-preview": "catalog:silk",
 		"tsx": "catalog:silk",
 		"typescript": "catalog:silk",
-		"vite": "^8.0.10"
+		"vite": "^8.0.15"
 	},
 	"peerDependencies": {
 		"vitest": ">=4.1.0"
