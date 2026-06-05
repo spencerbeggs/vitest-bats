@@ -90,7 +90,7 @@ pnpm run build:prod   # Production build
 ## Code Style
 
 This project uses [Biome](https://biomejs.dev/) for linting and formatting.
-Configuration extends `@savvy-web/lint-staged/biome/silk.jsonc`. Run
+Configuration extends `@savvy-web/silk/biome`. Run
 `pnpm run lint:fix` before committing.
 
 ### Import Conventions

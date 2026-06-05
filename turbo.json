@@ -20,7 +20,7 @@
 				"!.vscode/**"
 			],
 			"outputLogs": "full",
-			"outputs": ["dist/dev/**", ".rslib/declarations/dev/**"]
+			"outputs": ["dist/dev/**"]
 		},
 		"build:prod": {
 			"cache": true,
@@ -40,7 +40,7 @@
 				"!.vscode/**"
 			],
 			"outputLogs": "full",
-			"outputs": ["dist/npm/**", ".rslib/declarations/npm/**"]
+			"outputs": ["dist/npm/**", "dist/github/**"]
 		},
 		"types:check": {
 			"cache": true,

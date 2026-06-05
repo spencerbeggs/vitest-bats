@@ -105,7 +105,7 @@ pnpm run build:prod        # Build production/npm output only
 ### Biome
 
 Unified linter and formatter. Configuration in `biome.jsonc` extends
-`@savvy-web/lint-staged/biome/silk.jsonc`.
+`@savvy-web/silk/biome`.
 
 ### Husky Git Hooks
 
