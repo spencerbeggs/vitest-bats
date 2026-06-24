@@ -27,7 +27,6 @@
 	},
 	"scripts": {
 		"build:dev": "node savvy.build.ts --target dev",
-		"build:meta": "node savvy.build.ts --target meta",
 		"build:prod": "node savvy.build.ts --target prod",
 		"prepare": "node savvy.build.ts --target dev",
 		"types:check": "tsgo --noEmit"
@@ -40,7 +39,7 @@
 		"minimatch": "^10.2.5"
 	},
 	"devDependencies": {
-		"@savvy-web/bundler": "^0.4.0",
+		"@savvy-web/bundler": "^0.9.2",
 		"@types/node": "catalog:silk",
 		"@typescript/native-preview": "catalog:silk",
 		"tsx": "catalog:silk",
