@@ -39,14 +39,14 @@
 		"minimatch": "^10.2.5"
 	},
 	"devDependencies": {
-		"@savvy-web/bundler": "^0.9.2",
+		"@savvy-web/bundler": "^2.0.3",
 		"@types/node": "catalog:silk",
 		"tsx": "catalog:silk",
 		"typescript": "catalog:silk",
-		"vite": "^8.0.10"
+		"vite": "^8.1.5"
 	},
 	"peerDependencies": {
-		"vitest": ">=4.1.0"
+		"vitest": "catalog:silkPeers"
 	},
 	"peerDependenciesMeta": {
 		"vitest": {
