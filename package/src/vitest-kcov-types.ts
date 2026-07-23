@@ -33,6 +33,7 @@
  * - `verbose`: Show all messages including debug and informational
  * - `debug`: Show debug messages and errors
  * - `errors-only`: Only show errors and warnings
+ * @public
  */
 export type LogLevel = "verbose" | "debug" | "errors-only";
 
@@ -44,6 +45,7 @@ export type LogLevel = "verbose" | "debug" | "errors-only";
  * - `auto`: Auto-detect terminal support for HTE links (VSCode, iTerm 3.1+, WezTerm)
  * - `default`: Plain text paths (e.g., "coverage/vitest/index.html")
  * - `hte`: Hypertext Escape sequences (OSC 8) for clickable links in compatible terminals
+ * @public
  */
 export type LinkFormat = "auto" | "default" | "hte";
 
@@ -67,6 +69,7 @@ export type LinkFormat = "auto" | "default" | "hte";
  * **Recommendation:**
  * Set branch threshold to 100% to maintain format compatibility, but rely on line coverage
  * for actual quality metrics.
+ * @public
  */
 export interface KcovThresholds {
 	/**
@@ -98,7 +101,8 @@ export interface KcovThresholds {
  * These options control how kcov collects and reports coverage for shell scripts.
  * All options are optional and have sensible defaults.
  *
- * @see {@link incremental} for timestamped report directories useful for debugging
+ * @see {@link KcovOptions.incremental} for timestamped report directories useful for debugging
+ * @public
  */
 export interface KcovOptions {
 	/**

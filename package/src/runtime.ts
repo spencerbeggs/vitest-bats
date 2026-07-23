@@ -5,10 +5,19 @@ import { executeBats } from "./bats-executor.js";
 import type { BatsDeps, KcovConfig, RunMode, StubSpec } from "./bats-generator.js";
 import { generateBatsFile } from "./bats-generator.js";
 
+/**
+ * A single recorded invocation of a mocked command, captured back to the test as
+ * part of {@link BatsResult.calls}.
+ * @public
+ */
 export interface MockCall {
 	args: string[];
 }
 
+/**
+ * The raw fields decoded from a BATS run, wrapped by the {@link BatsResult} class.
+ * @public
+ */
 export interface BatsResultData {
 	status: number;
 	output: string;
@@ -27,10 +36,18 @@ export interface BatsResultData {
  *
  * Registered with `Symbol.for(...)` so the symbol is shared across module
  * graphs (the global symbol registry is process-wide).
+ * @internal
  */
 export const BATS_RESULT_BRAND: unique symbol = Symbol.for("vitest-bats.BatsResult") as never;
 
+/**
+ * The value returned by `ScriptBuilder.run()`/`.exec()`. Wraps the raw exit status,
+ * stdout/stderr (whole and split into lines), and recorded mock calls; assert
+ * against it with the `expect.extend` matchers from `vitest-bats/setup`.
+ * @public
+ */
 export class BatsResult {
+	/** @internal */
 	readonly [BATS_RESULT_BRAND] = true;
 	readonly status: number;
 	readonly output: string;
@@ -66,6 +83,11 @@ export class BatsResult {
 
 const builders = new Set<ScriptBuilder>();
 
+/**
+ * Resets every live `ScriptBuilder`'s `env()`/`flags()`/`mock()` configuration.
+ * Called automatically between tests by `vitest-bats/setup`'s `beforeEach` hook.
+ * @public
+ */
 export function resetAllBuilders(): void {
 	for (const b of builders) {
 		b.reset();
@@ -98,6 +120,12 @@ function makeRecorderDir(): string {
 	return dir;
 }
 
+/**
+ * Test-writing API returned by a `.sh` import. Configure with `env()`/`flags()`/
+ * `mock()`, then terminate with `run(...args)` or `exec(shellExpr)` to get a
+ * {@link BatsResult}.
+ * @public
+ */
 export class ScriptBuilder {
 	readonly path: string;
 	readonly name: string;

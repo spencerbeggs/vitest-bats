@@ -3,6 +3,10 @@ import type { BatsResult } from "./runtime.js";
 import { BATS_RESULT_BRAND } from "./runtime.js";
 import { validate as schemaValidate } from "./schema.js";
 
+/**
+ * The `{ pass, message }` shape expected by Vitest's `expect.extend`.
+ * @public
+ */
 export interface MatcherResult {
 	pass: boolean;
 	message: () => string;
@@ -88,6 +92,12 @@ function partialMatch(actual: unknown, expected: unknown): boolean {
 	);
 }
 
+/**
+ * The 23 `expect.extend` matchers registered by `vitest-bats/setup` (auto-injected
+ * by {@link BatsPlugin}). Cover status, stdout/stderr, lines, mock calls, JSON
+ * values, and schema validation against a `BatsResult`.
+ * @public
+ */
 export const batsMatchers = {
 	// ============= Status =============
 	toSucceed(received: unknown): MatcherResult {

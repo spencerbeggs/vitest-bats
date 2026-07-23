@@ -40,15 +40,15 @@
 		"types:check": "tsc --noEmit"
 	},
 	"devDependencies": {
-		"@savvy-web/silk": "^3.0.2",
-		"@vitest-agent/plugin": "^2.0.0",
+		"@savvy-web/silk": "^3.1.2",
+		"@vitest-agent/plugin": "^2.0.6",
 		"vitest-bats": "workspace:*"
 	},
-	"packageManager": "pnpm@11.5.1+sha512.93f7b57422ea7068257235b4c16eb60762eb68e1dc23723199cc739043ea9be2c4143274a399d8c6defa2b1176226d9ca1c4b63482d6200c1a8fbaa78c1",
+	"packageManager": "pnpm@11.16.0+sha512.b767e9a98fc87aec0f42daefcd0e84941c2cdb45d73c4e1e68860fb2bdfdbe032ab592105479e5e05c237f740c8a5ffdbbb52385797ddc2296745a1bbb883e8d",
 	"devEngines": {
 		"packageManager": {
 			"name": "pnpm",
-			"version": "10.34.1",
+			"version": "11.16.0+sha512.b767e9a98fc87aec0f42daefcd0e84941c2cdb45d73c4e1e68860fb2bdfdbe032ab592105479e5e05c237f740c8a5ffdbbb52385797ddc2296745a1bbb883e8d",
 			"onFail": "ignore"
 		},
 		"runtime": [

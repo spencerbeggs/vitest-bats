@@ -4,6 +4,10 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import type { BatsResultData, MockCall } from "./runtime.js";
 
+/**
+ * Options for {@link executeBats}.
+ * @internal
+ */
 export interface ExecuteOptions {
 	batsPath: string;
 	batsContent: string;
@@ -38,6 +42,10 @@ function decodeB64(b64: string): string {
 	return Buffer.from(b64, "base64").toString("utf-8");
 }
 
+/**
+ * Parses the base64-encoded result payload written by the generated BATS test file.
+ * @internal
+ */
 export function parseExecutionResult(recorderDir: string): BatsResultData {
 	const resultPath = join(recorderDir, "result.txt");
 	if (!existsSync(resultPath)) {
@@ -106,6 +114,10 @@ export function parseExecutionResult(recorderDir: string): BatsResultData {
 	};
 }
 
+/**
+ * Spawns `bats` against a generated `.bats` file and parses the recorded result.
+ * @internal
+ */
 export function executeBats(opts: ExecuteOptions): BatsResultData {
 	mkdirSync(opts.recorderDir, { recursive: true });
 

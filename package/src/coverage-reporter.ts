@@ -22,6 +22,10 @@ interface CoberturaLine {
 	"@_hits": string;
 }
 
+/**
+ * Coverage thresholds applied to the merged v8/kcov CoverageMap.
+ * @public
+ */
 export interface CoverageThresholds {
 	statements: number;
 	branches: number;
@@ -29,6 +33,13 @@ export interface CoverageThresholds {
 	lines: number;
 }
 
+/**
+ * Vitest coverage reporter that merges kcov's shell-script coverage into the v8
+ * Istanbul CoverageMap, with synthetic branch/function entries so threshold checks
+ * pass (kcov only tracks statements/lines). Always injected by {@link BatsPlugin}
+ * when coverage is enabled.
+ * @public
+ */
 export class BatsCoverageReporter {
 	private cacheDir: string;
 	private thresholds: CoverageThresholds | false;

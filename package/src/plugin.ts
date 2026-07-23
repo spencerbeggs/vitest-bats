@@ -6,6 +6,10 @@ import type { Plugin } from "vitest/config";
 import type { VitestPluginContext } from "vitest/node";
 import type { LinkFormat, LogLevel } from "./vitest-kcov-types.js";
 
+/**
+ * Options for {@link BatsPlugin}.
+ * @public
+ */
 export interface BatsPluginOptions {
 	/**
 	 * Shell script coverage mode. Default: "auto"
@@ -191,6 +195,11 @@ function formatMissingDeps(missing: Dependency[], onMacOS: boolean): string {
 
 const VIRTUAL_PREFIX = "\0bats:";
 
+/**
+ * Vitest plugin that wires up `.sh` imports, dependency detection, coverage
+ * option handling, matcher setup-file injection, and coverage reporter injection.
+ * @public
+ */
 export function BatsPlugin(options: BatsPluginOptions = {}): Plugin {
 	const registeredScripts = new Set<string>();
 	let cacheDir: string | null = null;

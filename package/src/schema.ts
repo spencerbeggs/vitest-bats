@@ -1,13 +1,19 @@
 import type { StandardSchemaV1 } from "@standard-schema/spec";
 import type { ErrorObject, ValidateFunction } from "ajv";
 import { Ajv } from "ajv";
-import addFormatsModule, { type FormatsPlugin } from "ajv-formats";
+import type { FormatsPlugin } from "ajv-formats";
+import addFormatsModule from "ajv-formats";
 
 // ajv-formats ships as CJS with both `module.exports = plugin` and
 // `exports.default = plugin`. Under verbatimModuleSyntax we reach through
 // .default to get the callable plugin.
 const addFormats: FormatsPlugin = (addFormatsModule as unknown as { default: FormatsPlugin }).default;
 
+/**
+ * Result of {@link validate}: either success, or failure with human-readable issue
+ * strings, used internally by the `toMatchSchema`/`toMatchJsonSchema` matchers.
+ * @internal
+ */
 export type ValidationResult = { ok: true } | { ok: false; issues: string[] };
 
 let ajvSingleton: Ajv | null = null;
@@ -22,6 +28,12 @@ function getAjv(): Ajv {
 
 const compiledCache = new WeakMap<object, ValidateFunction>();
 
+/**
+ * Detects whether `schema` implements the Standard Schema (`~standard`) interface,
+ * used by the `toMatchSchema` matcher to route to Standard Schema vs. JSON Schema
+ * validation.
+ * @internal
+ */
 export function isStandardSchema(schema: unknown): schema is StandardSchemaV1 {
 	if (schema === null || typeof schema !== "object") return false;
 	if (!("~standard" in schema)) return false;
@@ -72,6 +84,11 @@ function validateJsonSchema(schema: object, value: unknown): ValidationResult {
 	return { ok: false, issues };
 }
 
+/**
+ * Validates `value` against a Standard Schema validator or a raw JSON Schema
+ * object, backing the `toMatchSchema`/`toMatchJsonSchema` matchers.
+ * @internal
+ */
 export function validate(schema: unknown, value: unknown): ValidationResult {
 	if (isStandardSchema(schema)) {
 		return validateStandard(schema, value);

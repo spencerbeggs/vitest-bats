@@ -1,22 +1,45 @@
 import { dirname } from "node:path";
 
+/**
+ * Resolved paths to the `bats` binary and the `bats-support` library, detected by
+ * `BatsPlugin` and threaded through to {@link generateBatsFile}.
+ * @internal
+ */
 export interface BatsDeps {
 	batsPath: string;
 	batsSupportPath: string;
 }
 
+/**
+ * Resolved kcov binary path and output directory for a single script run.
+ * @internal
+ */
 export interface KcovConfig {
 	kcovPath: string;
 	outputDir: string;
 }
 
+/**
+ * A single `mock()` call's command name and pattern-to-response map, as recorded
+ * by `ScriptBuilder`.
+ * @internal
+ */
 export interface StubSpec {
 	cmd: string;
 	responses: Record<string, string>;
 }
 
+/**
+ * Whether the generated `.bats` file invokes the script with argv (`run()`) or as a
+ * raw shell expression (`exec()`).
+ * @internal
+ */
 export type RunMode = { kind: "args" } | { kind: "shell"; expression: string };
 
+/**
+ * Input to {@link generateBatsFile}.
+ * @internal
+ */
 export interface GenerateInput {
 	scriptPath: string;
 	args: string[];
@@ -148,6 +171,11 @@ function buildRunCommand(
 	return wrapWithKcov(target);
 }
 
+/**
+ * Renders a `.bats` file body for a single `ScriptBuilder` invocation: setup (deps,
+ * env, recorder, mock shims, kcov), the `run` command, and the base64 result capture.
+ * @internal
+ */
 export function generateBatsFile(input: GenerateInput): string {
 	const { scriptPath, args, env, flags, stubs, recorderDir, deps, mode, kcov } = input;
 
