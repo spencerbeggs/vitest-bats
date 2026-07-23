@@ -80,7 +80,7 @@ importers:
         specifier: ^3.0.1
         version: 3.0.1(ajv@8.20.0)
       fast-xml-parser:
-        specifier: ^5.8.0
+        specifier: ^5.10.1
         version: 5.10.1
       minimatch:
         specifier: ^10.2.5

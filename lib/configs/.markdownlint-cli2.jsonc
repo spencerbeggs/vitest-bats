@@ -12,7 +12,11 @@
 		"**/dist",
 		"**/CHANGELOG.md",
 		"**/.claude/plans",
-		"**/docs/superpowers"
+		"**/docs/superpowers",
+		"**/.git",
+		"**/__test__/**/fixtures/**",
+		"**/__fixtures__/**",
+		"**/.repos"
 	],
 	"customRules": ["@savvy-web/silk/changesets/markdownlint"],
 	"config": {
