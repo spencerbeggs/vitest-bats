@@ -12,7 +12,6 @@
 // Force this file to be treated as a module so the `declare module`
 // block below is an augmentation, not a module declaration that
 // replaces the real `vitest` package.
-import type {} from "vitest";
 
 declare module "vitest" {
 	interface Assertion {
