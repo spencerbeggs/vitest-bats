@@ -40,7 +40,7 @@
 		"types:check": "tsc --noEmit"
 	},
 	"devDependencies": {
-		"@savvy-web/silk": "^3.2.1",
+		"@savvy-web/silk": "^3.2.3",
 		"@vitest-agent/plugin": "^2.0.6",
 		"vitest-bats": "workspace:*"
 	},
