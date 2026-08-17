@@ -40,13 +40,13 @@
 	},
 	"devDependencies": {
 		"@savvy-web/bundler": "^2.1.12",
-		"@types/node": "catalog:silk",
+		"@types/node": "catalog:build",
 		"tsx": "catalog:silk",
-		"typescript": "catalog:silk",
+		"typescript": "catalog:build",
 		"vite": "^8.1.5"
 	},
 	"peerDependencies": {
-		"vitest": "catalog:silkPeers"
+		"vitest": "catalog:test:peers"
 	},
 	"peerDependenciesMeta": {
 		"vitest": {
