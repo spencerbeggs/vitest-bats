@@ -43,7 +43,7 @@
 		"@types/node": "catalog:build",
 		"tsx": "catalog:silk",
 		"typescript": "catalog:build",
-		"vite": "^8.1.5"
+		"vite": "catalog:docs"
 	},
 	"peerDependencies": {
 		"vitest": "catalog:test:peers"
