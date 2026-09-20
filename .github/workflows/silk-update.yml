@@ -53,6 +53,8 @@ jobs:
             @effected/pnpm-plugin-effect
           dependencies: |
             @savvy-web/*
+            @effected/*
+            @okfit/*
             @standard-schema/spec
             ajv
             ajv-formats
