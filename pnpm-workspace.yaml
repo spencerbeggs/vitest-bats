@@ -2,7 +2,7 @@ packages:
   - package
 autoInstallPeers: true
 configDependencies:
-  "@effected/pnpm-plugin-effect": 0.12.1
+  "@effected/pnpm-plugin-effect": 0.12.4
   "@savvy-web/pnpm-plugin-silk": 0.44.1
 minimumReleaseAgeExclude:
   - "@rolldown/binding-openharmony-arm64@1.2.8"
