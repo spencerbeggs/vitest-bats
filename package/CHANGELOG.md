@@ -1,5 +1,21 @@
 # vitest-bats
 
+## 0.0.3
+
+### Dependencies
+
+| Dependency | Type | Action | From | To |
+| --- | --- | --- | --- | --- |
+| fast-xml-parser | dependency | updated | ^5.11.1 | ^5.11.2 |
+
+[#145][#145]
+
+### Thanks
+
+Thanks to [@spencerbeggs](https://github.com/apps/spencerbeggs) for their contributions!
+
+[#145]: https://github.com/spencerbeggs/vitest-bats/pull/145
+
 ## 0.0.2
 
 ### Dependencies
