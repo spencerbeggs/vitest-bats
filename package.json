@@ -40,8 +40,8 @@
 		"types:check": "tsc --noEmit"
 	},
 	"devDependencies": {
-		"@okfit/plugin": "^0.5.12",
-		"@savvy-web/silk": "^4.3.5",
+		"@okfit/plugin": "^0.5.13",
+		"@savvy-web/silk": "^4.3.6",
 		"@vitest-agent/plugin": "^5.0.0",
 		"vitest-bats": "workspace:*"
 	},
