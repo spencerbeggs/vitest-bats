@@ -13,96 +13,96 @@ importers:
         version: 0.48.0
     packageManagerDependencies:
       pnpm:
-        specifier: 12.12.1
-        version: 12.12.1
+        specifier: 12.13.0
+        version: 12.13.0
 
 packages:
 
   '@effected/pnpm-plugin-effect@0.15.0':
     resolution: {integrity: sha512-a5/3hy9fawhmzzQ6n7wmB8QJ5EuPRKZhRkiPpCkj6MMYz2Z0mqqX7cCCRZOnGlHtp/LbXgQBl+gNnWsdvWk10g==}
 
-  '@pnpm/exe.android-arm64@12.12.1':
-    resolution: {integrity: sha512-+yg8ErBmGyi7VGjontMkjyUOIusBEaSUZB2Ao+kSmZtIIkQ6AfrO/A1e6ycUMtaUJ++o+gmqk52sqlHkSDR9Pg==}
+  '@pnpm/exe.android-arm64@12.13.0':
+    resolution: {integrity: sha512-BI++xXYAk3lTLQ1695b3pAAaLwzUTQqKyT5UukVd1NU5qv7h/rUfVCiV5hrLksdbgPMWcic8gf9uXMiqTlerzg==}
     cpu: [arm64]
     os: [android]
 
-  '@pnpm/exe.android-x64@12.12.1':
-    resolution: {integrity: sha512-d1U7DmdiLsXkuQl/EPlng3JKTwFC6LmmEmic8XcemrfIYF0TFp9WNR0JdjqFcE1kdvomLsP8qrkGrOVtQ89TxQ==}
+  '@pnpm/exe.android-x64@12.13.0':
+    resolution: {integrity: sha512-bFq6cnbSB3fezJ0siOtuoRqLiR3VXFCZvUUFa0wlZ4a3EaJYsnnDli4ZTe8/bDfX1UhNMFxAAiSAKg7xITu+Zw==}
     cpu: [x64]
     os: [android]
 
-  '@pnpm/exe.darwin-arm64@12.12.1':
-    resolution: {integrity: sha512-MiDDp8DLFFizQId7oiOhtzZ2yM97d3gHVFAxL0wgFCu/SZv8enY9N283HJebyAj63P2pDIYe70krHgWEyVvElQ==}
+  '@pnpm/exe.darwin-arm64@12.13.0':
+    resolution: {integrity: sha512-9rRpaMGxxrv5YbptsRTIeG+q2IzQyrkRKXkD30pb7weCC6Xz6vQzfkItzrUZsb2bXyYd7fSsq+luTsreXBQYyQ==}
     cpu: [arm64]
     os: [darwin]
 
-  '@pnpm/exe.darwin-x64@12.12.1':
-    resolution: {integrity: sha512-81CoZFGlOddF7kiuW+KRMabrWpUWyfljPydes6n8P3sFGBdR+d04tKP8E9I9wp4MQ+kj/n2g8MbFDu0+c7pwSw==}
+  '@pnpm/exe.darwin-x64@12.13.0':
+    resolution: {integrity: sha512-A+VFQakozmXIo8kxtcP9sZCKIi94f9uB5jLXRvwnNSA5G6/G6Iq/8E17+fIPf4bm7xvR+qeM794Nz98Q52lutQ==}
     cpu: [x64]
     os: [darwin]
 
-  '@pnpm/exe.freebsd-x64@12.12.1':
-    resolution: {integrity: sha512-kvwMpN165MpKfbg8wXXUcIutW4ZsF+CJdgkKNmP0Ux00wY2emV/8exiFcWc2ub4J+gG9GRppvafMNohZbLMvbg==}
+  '@pnpm/exe.freebsd-x64@12.13.0':
+    resolution: {integrity: sha512-HqT2ppLDxmpO8jTgl44BLdrBQoQXE73HHBElYRKvxL47d4maQ0sfk+fI+bfeDpRTqKzc5JZfj85yjRo7anqioA==}
     cpu: [x64]
     os: [freebsd]
 
-  '@pnpm/exe.linux-arm64-musl@12.12.1':
-    resolution: {integrity: sha512-Evrem/af4+oqkjRv9sSBdXTPGDWsxMActgpVpUvMeSWm/42r58PtzIikZF+9YKaBYXF/CjmqasGvgeIsLicdQg==}
+  '@pnpm/exe.linux-arm64-musl@12.13.0':
+    resolution: {integrity: sha512-yZfm/7h1Kdd1XTNf9+F2Gt5R4WuQKMRbkMIpbzCtxpzniPEKGo/2kymNxdHq3jIcfnzHnP+KBR/YONZ+4Icq+g==}
     cpu: [arm64]
     os: [linux]
     libc: [musl]
 
-  '@pnpm/exe.linux-arm64@12.12.1':
-    resolution: {integrity: sha512-RsGsD7WF1xQbTU1LW/5PLRiVMdMkQCYrOjTbHdaTYebelRYPgjRlxG8u0oVtVTD62ePNCjwQp+DSE8q8E+dyUA==}
+  '@pnpm/exe.linux-arm64@12.13.0':
+    resolution: {integrity: sha512-jp29ia+fTNhheXzt4FRUw5CwFW9caPNEdLRuy7/Dlbv3sj+iHldfJXfCojkPE4g71NPVwMpY5Eoc7nkfWexqrA==}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
-  '@pnpm/exe.linux-ppc64@12.12.1':
-    resolution: {integrity: sha512-e3/q1q+HHISpQcjKl1UmtzNKX4ImbcqYfH/3loclW8iuhGSJkqME/eym0odH5XI2c2dd8DHiN5aRDwM/g/C2tA==}
+  '@pnpm/exe.linux-ppc64@12.13.0':
+    resolution: {integrity: sha512-BO8Nz70baL6KV0G9p+Lx8l6BQYFE11KDEOTTjSNZdiUMMyN1byeDlls10ZgCIaIq5ELlLJ0F/LKieNjubOC7BA==}
     cpu: [ppc64]
     os: [linux]
     libc: [glibc]
 
-  '@pnpm/exe.linux-riscv64@12.12.1':
-    resolution: {integrity: sha512-utNVjoXSmMsoG8t1iGQCGzk9WHu+SDW8MC+rBE80zy3Qh5CWqZelC9AgwBhxhEcCCZAxCXTtSBqjAQRLp0qn5g==}
+  '@pnpm/exe.linux-riscv64@12.13.0':
+    resolution: {integrity: sha512-LrGM+VzpNghXuHK1XSMNEsochaLscAYkllSPLF3Y4CQpaOFYmiZoX+G3TN+T3pYRxdgvwWJCqbbdwRJZFykrig==}
     cpu: [riscv64]
     os: [linux]
     libc: [glibc]
 
-  '@pnpm/exe.linux-s390x@12.12.1':
-    resolution: {integrity: sha512-58AS/lraL54lqrGe+Z8wYHsbkbYq2/CMcUYEr33CkZ9qd4LtltvrWhCSLm1dxiZ35hPs/UdyvWUYVYCZlXq6sw==}
+  '@pnpm/exe.linux-s390x@12.13.0':
+    resolution: {integrity: sha512-0Xetcb9OJpXYmJ7rMDh3oFszIvbQl0F8UNh7oJnbLJY1K5PtDgYVkjqwb1JpjU0mkr0b4HKkFdZhlYh7XEGTvw==}
     cpu: [s390x]
     os: [linux]
     libc: [glibc]
 
-  '@pnpm/exe.linux-x64-musl@12.12.1':
-    resolution: {integrity: sha512-uYugCvgK4S+cYNldIaU54Ir54EYUvb+mnm37c0jfjZajCJ2EevnxS3107cNNQINHhMb2wiAzItg3r7XKvHyHpA==}
+  '@pnpm/exe.linux-x64-musl@12.13.0':
+    resolution: {integrity: sha512-LSD/snRsouEGA52HrTfEbGrCGdkkr5gXfQym26Ogu3I7sc5dJHUHyp8GnA7ewXrFOSRCJXH25mnmQ6Jpit572Q==}
     cpu: [x64]
     os: [linux]
     libc: [musl]
 
-  '@pnpm/exe.linux-x64@12.12.1':
-    resolution: {integrity: sha512-3bJ3kvMif7clfxePoBZ40FGvU54GhLwQ+ebxjxGuKYHwrDySMfyggVGR0gYYcprq6IPGy6CrTPiqgP5TOTLC5w==}
+  '@pnpm/exe.linux-x64@12.13.0':
+    resolution: {integrity: sha512-t4EYUFG4SPYaJJVQToWIPq/lLBquCPCxMtt9vV//HirSDl332dnxDnwgvdW29sqLg3Ob2x7zFQ69HZLyoCyfpQ==}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@pnpm/exe.win32-arm64@12.12.1':
-    resolution: {integrity: sha512-bX317q9nhS0XPp6hx/sOBC+49GPkq068dsZxGzHBuEbTtLLGHEImFODE57emNhC66bF/UZHuoWRIGg6VNT0HuQ==}
+  '@pnpm/exe.win32-arm64@12.13.0':
+    resolution: {integrity: sha512-aDzzll9stgP+p6KKYHNzuShZhBCaxabv481xK5BjfvSnyFbjzu7ksKUIVlsiAw4xAXnrIqvEj0lQarsbBRcIQA==}
     cpu: [arm64]
     os: [win32]
 
-  '@pnpm/exe.win32-x64@12.12.1':
-    resolution: {integrity: sha512-/CSqxJLpAjrYQnD31/TEsWlyz+FLgyHYhv1TsSdZhVWQAg617e/qeJ9dcqBt/IStTL3MUkTpq3sqiVfouayiaA==}
+  '@pnpm/exe.win32-x64@12.13.0':
+    resolution: {integrity: sha512-Nkw4hDJTcmuO6zDjkTo4Dz7pG2ojEifSBGC4QbFJFIfBoRbN88GIMu/Lm1woxd7ONhJFlfJ+dJeiDyuP0NKtSA==}
     cpu: [x64]
     os: [win32]
 
   '@savvy-web/pnpm-plugin-silk@0.48.0':
     resolution: {integrity: sha512-hNtQbUiTsDmNcmRSmYJyZ+7C7hClkdiavXsg/K0hMxk6ih+hpeuMbMWQ05o+F4Bjfj8e1HBqInP4jkHlUzVQGw==}
 
-  pnpm@12.12.1:
-    resolution: {integrity: sha512-t/mJNMCx8ppl9dpS8tf5lOf6rVc//d3qFJf7Tcta7AUVkO58fZWjgXK0v64QOluD7fLuhm4Rcxwsr6lgY2EKxQ==}
+  pnpm@12.13.0:
+    resolution: {integrity: sha512-HlVxm/JugJ3OXFCE/euqZO+z2pA4rl1oqfimgxHxpFhByMO3ajcpjDtm9rzIBAmpt/M8eKcWij6Q+2Wl2CNa5A==}
     engines: {node: '>=18.*'}
     hasBin: true
 
@@ -110,66 +110,66 @@ snapshots:
 
   '@effected/pnpm-plugin-effect@0.15.0': {}
 
-  '@pnpm/exe.android-arm64@12.12.1':
+  '@pnpm/exe.android-arm64@12.13.0':
     optional: true
 
-  '@pnpm/exe.android-x64@12.12.1':
+  '@pnpm/exe.android-x64@12.13.0':
     optional: true
 
-  '@pnpm/exe.darwin-arm64@12.12.1':
+  '@pnpm/exe.darwin-arm64@12.13.0':
     optional: true
 
-  '@pnpm/exe.darwin-x64@12.12.1':
+  '@pnpm/exe.darwin-x64@12.13.0':
     optional: true
 
-  '@pnpm/exe.freebsd-x64@12.12.1':
+  '@pnpm/exe.freebsd-x64@12.13.0':
     optional: true
 
-  '@pnpm/exe.linux-arm64-musl@12.12.1':
+  '@pnpm/exe.linux-arm64-musl@12.13.0':
     optional: true
 
-  '@pnpm/exe.linux-arm64@12.12.1':
+  '@pnpm/exe.linux-arm64@12.13.0':
     optional: true
 
-  '@pnpm/exe.linux-ppc64@12.12.1':
+  '@pnpm/exe.linux-ppc64@12.13.0':
     optional: true
 
-  '@pnpm/exe.linux-riscv64@12.12.1':
+  '@pnpm/exe.linux-riscv64@12.13.0':
     optional: true
 
-  '@pnpm/exe.linux-s390x@12.12.1':
+  '@pnpm/exe.linux-s390x@12.13.0':
     optional: true
 
-  '@pnpm/exe.linux-x64-musl@12.12.1':
+  '@pnpm/exe.linux-x64-musl@12.13.0':
     optional: true
 
-  '@pnpm/exe.linux-x64@12.12.1':
+  '@pnpm/exe.linux-x64@12.13.0':
     optional: true
 
-  '@pnpm/exe.win32-arm64@12.12.1':
+  '@pnpm/exe.win32-arm64@12.13.0':
     optional: true
 
-  '@pnpm/exe.win32-x64@12.12.1':
+  '@pnpm/exe.win32-x64@12.13.0':
     optional: true
 
   '@savvy-web/pnpm-plugin-silk@0.48.0': {}
 
-  pnpm@12.12.1:
+  pnpm@12.13.0:
     optionalDependencies:
-      '@pnpm/exe.android-arm64': 12.12.1
-      '@pnpm/exe.android-x64': 12.12.1
-      '@pnpm/exe.darwin-arm64': 12.12.1
-      '@pnpm/exe.darwin-x64': 12.12.1
-      '@pnpm/exe.freebsd-x64': 12.12.1
-      '@pnpm/exe.linux-arm64': 12.12.1
-      '@pnpm/exe.linux-arm64-musl': 12.12.1
-      '@pnpm/exe.linux-ppc64': 12.12.1
-      '@pnpm/exe.linux-riscv64': 12.12.1
-      '@pnpm/exe.linux-s390x': 12.12.1
-      '@pnpm/exe.linux-x64': 12.12.1
-      '@pnpm/exe.linux-x64-musl': 12.12.1
-      '@pnpm/exe.win32-arm64': 12.12.1
-      '@pnpm/exe.win32-x64': 12.12.1
+      '@pnpm/exe.android-arm64': 12.13.0
+      '@pnpm/exe.android-x64': 12.13.0
+      '@pnpm/exe.darwin-arm64': 12.13.0
+      '@pnpm/exe.darwin-x64': 12.13.0
+      '@pnpm/exe.freebsd-x64': 12.13.0
+      '@pnpm/exe.linux-arm64': 12.13.0
+      '@pnpm/exe.linux-arm64-musl': 12.13.0
+      '@pnpm/exe.linux-ppc64': 12.13.0
+      '@pnpm/exe.linux-riscv64': 12.13.0
+      '@pnpm/exe.linux-s390x': 12.13.0
+      '@pnpm/exe.linux-x64': 12.13.0
+      '@pnpm/exe.linux-x64-musl': 12.13.0
+      '@pnpm/exe.win32-arm64': 12.13.0
+      '@pnpm/exe.win32-x64': 12.13.0
 
 ---
 lockfileVersion: '9.0'
@@ -243,8 +243,8 @@ importers:
         specifier: ^0.5.18
         version: 0.5.18(redis@6.3.0)
       '@savvy-web/silk':
-        specifier: ^4.3.9
-        version: 4.3.9(@changesets/cli@3.0.3)(@commitlint/cli@21.2.3(@types/node@26.6.5)(conventional-commits-parser@7.1.3)(typescript@7.0.2))(@commitlint/config-conventional@21.2.3)(@effected/config-file@0.15.0(@effected/glob@0.11.0(effect@4.0.3))(@effected/jsonc@0.16.0(effect@4.0.3))(@effected/toml@0.12.0(effect@4.0.3))(@effected/walker@0.16.0(@effected/glob@0.11.0(effect@4.0.3))(effect@4.0.3))(@effected/yaml@0.20.0(effect@4.0.3))(effect@4.0.3))(@types/bun@1.4.2)(@types/node@26.6.5)(@vitest/coverage-istanbul@5.0.4)(@vitest/coverage-v8@5.0.4)(@vitest/expect@5.0.4)(husky@9.1.7)(lint-staged@17.6.0)(markdownlint-cli2-formatter-codequality@0.0.8(markdownlint-cli2@0.23.3(supports-color@8.1.1)))(markdownlint-cli2@0.23.3(supports-color@8.1.1))(redis@6.3.0)(supports-color@8.1.1)(tsx@4.23.15)(turbo@2.11.7)(typescript@7.0.2)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.6.1)(tsx@4.23.15)(yaml@2.9.1))(vitest@5.0.4)
+        specifier: ^4.3.10
+        version: 4.3.10(@changesets/cli@3.0.3)(@commitlint/cli@21.2.3(@types/node@26.6.5)(conventional-commits-parser@7.1.3)(typescript@7.0.2))(@commitlint/config-conventional@21.2.3)(@effected/config-file@0.15.0(@effected/glob@0.11.0(effect@4.0.3))(@effected/jsonc@0.16.0(effect@4.0.3))(@effected/toml@0.12.0(effect@4.0.3))(@effected/walker@0.16.0(@effected/glob@0.11.0(effect@4.0.3))(effect@4.0.3))(@effected/yaml@0.20.0(effect@4.0.3))(effect@4.0.3))(@types/bun@1.4.3)(@types/node@26.6.5)(@vitest/coverage-istanbul@5.0.4)(@vitest/coverage-v8@5.0.4)(@vitest/expect@5.0.4)(husky@9.1.7)(lint-staged@17.6.0)(markdownlint-cli2-formatter-codequality@0.0.8(markdownlint-cli2@0.23.3(supports-color@8.1.1)))(markdownlint-cli2@0.23.3(supports-color@8.1.1))(redis@6.3.0)(supports-color@8.1.1)(tsx@4.23.15)(turbo@2.11.7)(typescript@7.0.2)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.6.1)(tsx@4.23.15)(yaml@2.9.1))(vitest@5.0.4)
       '@vitest-agent/plugin':
         specifier: ^5.0.0
         version: 5.4.4(@effected/config-file@0.15.0(@effected/glob@0.11.0(effect@4.0.3))(@effected/jsonc@0.16.0(effect@4.0.3))(@effected/toml@0.12.0(effect@4.0.3))(@effected/walker@0.16.0(@effected/glob@0.11.0(effect@4.0.3))(effect@4.0.3))(@effected/yaml@0.20.0(effect@4.0.3))(effect@4.0.3))(@effected/jsonc@0.16.0(effect@4.0.3))(@effected/toml@0.12.0(effect@4.0.3))(@effected/yaml@0.20.0(effect@4.0.3))(@vitest/coverage-istanbul@5.0.4)(@vitest/coverage-v8@5.0.4)(ink@8.0.0(react@19.3.0))(react@19.3.0)(redis@6.3.0)(vitest@5.0.4)
@@ -1277,26 +1277,26 @@ packages:
       satori:
         optional: true
 
-  '@savvy-web/changelog@1.0.17':
-    resolution: {integrity: sha512-0VsXHIG8CkJq/ar+bzThGTf5Rs001Uyw5JD29xriA5pTlZjr3n2neOvBaP9wpe7Y80NHELhirmy3nONni2YmdA==}
+  '@savvy-web/changelog@1.0.18':
+    resolution: {integrity: sha512-I+f7e4CGYVp9NWQY2V6SzTG62nKPWFL93edwmTafrQHUDiuRWQ51zVgO6Mra7poCWthqiO007Vw6jasLyp9qgw==}
 
-  '@savvy-web/cli@3.7.6':
-    resolution: {integrity: sha512-ZprwSGA1B1IyCf8s8zcvmG5Y6OIimOMWavIb1DCuUn+5Lf3tEnHjXtS7OyWGaKRBPygkLi/gdg9GCT91T8SUAg==}
+  '@savvy-web/cli@3.7.7':
+    resolution: {integrity: sha512-PSf77aGUfsVEhsODOOPCA8VhecHwgPRds9zg5NEIo3OzfJgydxpPka1txDHtw0Zrxe5e+zrdEhYAK5xHbZ3hyQ==}
     hasBin: true
 
-  '@savvy-web/mcp@3.4.9':
-    resolution: {integrity: sha512-FPt1QKLJpwNPBamCHTR5IjGRVKSAXBviBWXj6cxcVpbWQc+zzQG2eEl3nipnE8fYCIrDbVQgvz9x0aoaOEnF3w==}
+  '@savvy-web/mcp@3.4.10':
+    resolution: {integrity: sha512-doSmbpz6Rl3hhoDVjEGfi7K+oVQb+nxSe7+OzzIK/qJ4pV3GSXZpZH7nQ9F6ib2Mu0OP+i5odThfjgjbfeKJDw==}
     hasBin: true
 
-  '@savvy-web/silk-core@0.4.11':
-    resolution: {integrity: sha512-vG/msVuE/8QjmEd6gtLMV4hNxou2HexDxMFWomJb4W+SsZIBRdLiu1j7f4J0RILcTeUZJ2wxh/cUq808gB7cww==}
+  '@savvy-web/silk-core@0.4.12':
+    resolution: {integrity: sha512-vpDeTCmGBCAQ5KBwTLCT8kUTP1p+kYq3q/v7jdHsMHvFuxBtmn0wX4tEIhjZgEb5N0fFBnsrd0jPbRcf1gzyFw==}
     peerDependencies:
       '@effected/templates': ^0.11.0
       '@effected/workspaces': ^0.33.0
       effect: 4.0.3
 
-  '@savvy-web/silk-effects@9.5.1':
-    resolution: {integrity: sha512-kx/tPQxz3/1cPbj/sjq55DMa1Y7lkPAVII30LfYpcbrJSf2UCFp2sInrtEO76BfiLFBMkjHsQ7ERf2nPaBKRVA==}
+  '@savvy-web/silk-effects@9.5.2':
+    resolution: {integrity: sha512-Q1/E2AvMnFUGOmWcNUi3Thj3dFhquAFxToLgyu6h9K4S6/Lng6OJU6eRvQ46kUjkRRi/ZRuQNIWU5UGuK2ixcw==}
     peerDependencies:
       '@effected/commands': ^0.12.0
       '@effected/git': ^0.21.0
@@ -1304,8 +1304,8 @@ packages:
       '@effected/workspaces': ^0.33.0
       effect: 4.0.3
 
-  '@savvy-web/silk@4.3.9':
-    resolution: {integrity: sha512-gzz93ZhAEn2xfd8TWtsIcedk4ku+/N9yYvV1KIzeOu+tMbxiZ+xVAYz+R9hiohUkDjTZ+x9NeLZsH5B7TLeQdQ==}
+  '@savvy-web/silk@4.3.10':
+    resolution: {integrity: sha512-t5/UpTBfvJ22sAtSnQCw+sJ4+LYYEl0LxVpYkMNo8tORCuCbRsGs1eOEwoSLyLK37nB8EGU/m4VYJq/M8GvBzA==}
     hasBin: true
     peerDependencies:
       '@biomejs/biome': 2.5.15
@@ -1393,8 +1393,8 @@ packages:
   '@types/argparse@1.0.38':
     resolution: {integrity: sha512-ebDJ9b0e702Yr7pWgB0jzm+CX4Srzz8RcXtLJDJB+BSccqMa36uyH/zUsSYao5+BD1ytv3k3rPYCq4mAE1hsXA==}
 
-  '@types/bun@1.4.2':
-    resolution: {integrity: sha512-GimotNn7+ZV0uVArItBbriZsR1oNf0+WTzPkdcFrzShI7k2norL0uzEaJT8T33dWr7O/c9ZDuAFQrctKCi72oQ==}
+  '@types/bun@1.4.3':
+    resolution: {integrity: sha512-N67Pqy8JXbAY/j0tNraS3V5mubGvc6rrrNDmDCtZLlFzccbUJPDb0tvgUBC5q4m8ybkP93Jcn1QB+RYQ6PvBhw==}
 
   '@types/chai@5.2.3':
     resolution: {integrity: sha512-Mw558oeA9fFbv65/y4mHtXDs9bPnFMZAL/jxdPFUpOHHIXX91mcgEHbS5Lahr+pwZFR8A7GQleRWeI6cGFC2UA==}
@@ -1698,74 +1698,74 @@ packages:
   '@vitest/utils@5.0.4':
     resolution: {integrity: sha512-hgpnyMuMqCz2PARmk3v62FxUr8jHIkY13ygvUeh8s+dmQxfnvkB/sgtoZFzG4lMitnEdnrg/lCvDbtVzuAsGWQ==}
 
-  '@yuku-core/binding-android-arm64@0.18.1':
-    resolution: {integrity: sha512-1XTUWTmnpwXNyPwRLSQDjvHu7WPgykzCniYtTk+5ppnriznVONWd9TRPcFxCR8dlZ7HFGtv8v1wzbQmtmVlHNQ==}
+  '@yuku-core/binding-android-arm64@0.19.0':
+    resolution: {integrity: sha512-wdL2XmTiZixAOaHk9Z0JJZ8u9Qm8d333Zjpc6gaxXFX+UR5BlsfxZ7a2+2Rm71pamppsPYGUGFq2oVLbh6DISw==}
     cpu: [arm64]
     os: [android]
 
-  '@yuku-core/binding-darwin-arm64@0.18.1':
-    resolution: {integrity: sha512-7A7IPB/kEzIlm9Lwj6qVQ3ZORUH96mpqDWgGxkjmaAWGAfV4roTZWN+o7bW22BzcW55xbUKcZRslSZ8WRyqdQw==}
+  '@yuku-core/binding-darwin-arm64@0.19.0':
+    resolution: {integrity: sha512-7sNJa6XJhyetnTy64jw3NEi4YgUcezHk1G5GH9FSvXAuC8wIlbaOwT9lgq5qo5sspjrZJQlBR1TWflP49uRpMw==}
     cpu: [arm64]
     os: [darwin]
 
-  '@yuku-core/binding-darwin-x64@0.18.1':
-    resolution: {integrity: sha512-aBZgmsAf1u/ps042xE9pgH9zOY57Rn0K8BXOWjQ2dAIg4W5nyQ/Oo3U3+VAcaEeBt6Q/XCwnCUpshFpWQaOCrw==}
+  '@yuku-core/binding-darwin-x64@0.19.0':
+    resolution: {integrity: sha512-pTC7dYEc59isdyizc3nsuyFNBu2LU5wMYZ1be6UMr59PY/AJNtO1aBLWV0MgL/z7C1nv/2sX4TNjGgKLoeevJw==}
     cpu: [x64]
     os: [darwin]
 
-  '@yuku-core/binding-freebsd-x64@0.18.1':
-    resolution: {integrity: sha512-yOEEjmEW2XQWpoa+4J3+eVMhXd/4kMTXoLJ9WkhXMMeRpKGBtFGjX2uxV6qKuoti3talOnmMdi2/kvqkX+O4wQ==}
+  '@yuku-core/binding-freebsd-x64@0.19.0':
+    resolution: {integrity: sha512-xrZjF6XOEwyLOiDIfrwDdRCS6ghxcJeirNC1KivQhVcUwlRonaU79S3/Uiyx3lBylPnT8qKJ3/aMT+H52nGTJQ==}
     cpu: [x64]
     os: [freebsd]
 
-  '@yuku-core/binding-linux-arm-gnu@0.18.1':
-    resolution: {integrity: sha512-klpvuNubx19bsox50+ioEYfvwUj/+O6ML9YBDjzsz9PULffyOYxkR+i63BYvg//jAcEE9oHIQphm2Wz3vmk1TA==}
+  '@yuku-core/binding-linux-arm-gnu@0.19.0':
+    resolution: {integrity: sha512-0OyIH53C0I1CbADHn9FSdCfX5qbpeLwJhmOVhonFJNYheybOnkSJ50qGMfTJIb8y5zrwqvLs7FVBvz6Fk8maZg==}
     cpu: [arm]
     os: [linux]
     libc: [glibc]
 
-  '@yuku-core/binding-linux-arm-musl@0.18.1':
-    resolution: {integrity: sha512-eUG20Eh3Ycrm2D5WvRIn7BJp1+iPiFL0zLDdavVM5B6ymYEEmgrs6mime/h2y4Is1GA9uGyBBJQHaqKTcRiEng==}
+  '@yuku-core/binding-linux-arm-musl@0.19.0':
+    resolution: {integrity: sha512-z/iPfkCOCSXE34VXNt0uP1ORSW+4mEa9b5CiJcWZeqZH08g49bFU/jRM2T04f+Wpw5mJ6HIzNBiojxeAbrHjeg==}
     cpu: [arm]
     os: [linux]
     libc: [musl]
 
-  '@yuku-core/binding-linux-arm64-gnu@0.18.1':
-    resolution: {integrity: sha512-og2/svnJ2Awjz4INj2lQh0KQMwy4FrVCtD5SgfoZNxdv5knG6XdIyIvZycRCeyk15AkHdhwJqCsHJFcB3tjTxg==}
+  '@yuku-core/binding-linux-arm64-gnu@0.19.0':
+    resolution: {integrity: sha512-jLNTi+gzaRwBJ+gwhCJ+rDb5dmx/8hEBx93UWd7hjMSqPTL1D1wvVSvXVAldV5kALvju7b0/m51EHEhs4+I1fA==}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
-  '@yuku-core/binding-linux-arm64-musl@0.18.1':
-    resolution: {integrity: sha512-dmkidtxAY3iSUOFAOwnp7w8nVx1s9QdSdyiJPVw0TkBlLhQySuQer3Pir3tmhIhHC+Oc2Bn0f0QQpFNAMvzTPQ==}
+  '@yuku-core/binding-linux-arm64-musl@0.19.0':
+    resolution: {integrity: sha512-YwyPIdW/rN2Fmv0MTFWi47FaB3F9g+2b+sJISyAw83Yd60RWH4T3Nx6XkAHHVN+uKJNBAd6So7/BVihSiFYvuQ==}
     cpu: [arm64]
     os: [linux]
     libc: [musl]
 
-  '@yuku-core/binding-linux-x64-gnu@0.18.1':
-    resolution: {integrity: sha512-eXAZacTOzJbzv6sT/4h03MBE4DNGObfuTg3L6+FGADFt8Sam7peyhaFAekQIwvLETX3WYXhMwTehKPB69sdmcA==}
+  '@yuku-core/binding-linux-x64-gnu@0.19.0':
+    resolution: {integrity: sha512-/vskaAXVX3ESR43FiTdfiYS7z1b9uoQJwVQ/0RgUHgN2sWoAyCZs+aX4CgU7eKGIHTVfp9VFwv+c+2XchYiEtQ==}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@yuku-core/binding-linux-x64-musl@0.18.1':
-    resolution: {integrity: sha512-mdeItxbo5No5ht5XdHh0mCHDBne/STUuzphzGQQxVX+XSsBPbUHsZkmUAahycR6RoEP2UF/YBhg1M5f0phBO9A==}
+  '@yuku-core/binding-linux-x64-musl@0.19.0':
+    resolution: {integrity: sha512-FuXL5igeSKib9Rye02TdH+D6SQezTyGxIATMu1Qsn/QywrzwpGl35OLpS2C1x5vpGLeVE2XgiLd5mVPFHmIglQ==}
     cpu: [x64]
     os: [linux]
     libc: [musl]
 
-  '@yuku-core/binding-win32-arm64@0.18.1':
-    resolution: {integrity: sha512-0CyeB03Lr/QV9XHGyuChJ3V99X9M/6Q+3JB3ZRJWjqs13G1qIeIiHwsaCfqIJsqei9wxBtaKWZ1vBU7ApQfMEA==}
+  '@yuku-core/binding-win32-arm64@0.19.0':
+    resolution: {integrity: sha512-YuJAe7zEKT1Xa7LuHlhGJpPnYQeVtvo0rZvNjJRqkH0hQGOw4C8QeP30Tg5VKGzZfo2x8CjhjEhKt4TmLwfmdg==}
     cpu: [arm64]
     os: [win32]
 
-  '@yuku-core/binding-win32-x64@0.18.1':
-    resolution: {integrity: sha512-p0zG4bkR4++W011YbcP7Thg0UunaX9Lfg6U3nHEEwLrvTNy4P0+I5GO762tdjLozZpZwWLV/HmYNeecyOS2y5g==}
+  '@yuku-core/binding-win32-x64@0.19.0':
+    resolution: {integrity: sha512-o8iY/mXwlRkedp0LNTr4+TEfXTPQwoNZmv6k+1WIAd1ZXEn8xJJTBCtB0osaVvdZo/x/cNmV16UrWrrGpM5Mvw==}
     cpu: [x64]
     os: [win32]
 
-  '@yuku-toolchain/types@0.18.1':
-    resolution: {integrity: sha512-rWtqVdjA8O34nV/4mBFIdUm5Zj+FIzZDR7P2PEpqXXp53VEHabTROu7j2RjzzJbLMVYjW6gDKwOgPgiKRA+x4w==}
+  '@yuku-toolchain/types@0.19.0':
+    resolution: {integrity: sha512-tFkNbsP4WXX9UMUC5syJGdK9dPMLK0PPaIuXCcCYH75sZ8MrebfBZ2XvCILRTw8AgLivSSCfDa4R67iYBDa4Kg==}
 
   acorn-typescript@1.4.13:
     resolution: {integrity: sha512-xsc9Xv0xlVfwp2o7sQ+GCQ1PgbkdcpWdTzrwXxO3xDMTAywVS3oXVOcOHuRjAPkS4P9b+yc/qNF15460v+jp4Q==}
@@ -1867,11 +1867,11 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
 
-  bun-types@1.4.2:
-    resolution: {integrity: sha512-bxV1FgK7yBIzjRe5zBozIM4Bem11ZJcCXSrjWRG3YWLt8yFDePu4cLjpebO8OvPeIE9trbyPF4fuj3Cia4Fj3w==}
+  bun-types@1.4.3:
+    resolution: {integrity: sha512-tinRJNGOmUN+tEAsn2y2e942n9JHRHR42iUYzDH75NmhJqVBokGSQkkfSFdNWwsANIdrK6ACH9t01M452YyTwg==}
 
-  cac@7.0.1:
-    resolution: {integrity: sha512-86diuUyeeWM8CrqhpGCaDafrzjS1s++7sWy2AbAPoFNz/xKv7ID57CR4pZsMuGCh60PtsnEx4z68b+Vgt07VPw==}
+  cac@7.1.0:
+    resolution: {integrity: sha512-LMDU/U2yA4IPIY8KT0NsNPWEYZvAMkbgyspxJ6btJaYV+WMDOHAZCmB0lsTObiHaRS1V/ztKAl7+TSkTqXyeoA==}
     engines: {node: '>=20.19.0'}
 
   callsites@3.1.0:
@@ -2736,8 +2736,8 @@ packages:
     resolution: {integrity: sha512-g6QUff04oZpHs0eG5p83rFLhHeV00ug/Yf9nZM6fLeUrPguBTkTQOdpAWWspMh55TZfVQDPaN3NQJfbVRAxdIw==}
     engines: {iojs: '>=1.0.0', node: '>=0.10.0'}
 
-  rolldown-plugin-dts@0.28.7:
-    resolution: {integrity: sha512-o0lA6/NPzBAhMFgnIVJgW4eMBbMBQ8sXEbq4GqEHloerWMLqLNatpFy5AlWpEKskFShWKNghMMI8naul9Lgo5Q==}
+  rolldown-plugin-dts@0.28.8:
+    resolution: {integrity: sha512-FVhfqxorCWcc20BVT5eVRfRjzLLl6mgzjcMR4gSBf0K4oQMXT0qoHhhzfXy0L7y83fQy7Ug5ZDNk90xM3/LiCQ==}
     engines: {node: ^22.18.0 || ^24.11.0 || >=26.0.0}
     peerDependencies:
       '@typescript/native-preview': '*'
@@ -2948,6 +2948,9 @@ packages:
   unconfig-core@7.5.0:
     resolution: {integrity: sha512-Su3FauozOGP44ZmKdHy2oE6LPjk51M/TRRjHv2HNCWiDvfvCoxC2lno6jevMA91MYAdCdwP05QnWdWpSbncX/w==}
 
+  undici-types@8.11.2:
+    resolution: {integrity: sha512-iMVNmWZ0leK/goS6eXMizSzmm9CDWtyphwbaCms3DNLqRxDL+mMoNVcZMTyyVgXP0N+Z8neAMzDoUOUJL8veKg==}
+
   undici-types@8.9.0:
     resolution: {integrity: sha512-KTDyRTYX8sWmKXAikPHHSyc63CRPETMctyjKFupcC6OBLXT3xsN0e9aF7m+mIXutFWpUXuedtowG7iLOzp0kQg==}
 
@@ -3148,20 +3151,20 @@ packages:
   yoga-layout@3.2.1:
     resolution: {integrity: sha512-0LPOt3AxKqMdFBZA3HBAt/t/8vIKq7VaQYbuA8WxCgung+p9TVyKRYdpvCb80HcdTN2NkbIKbhNwKUfm3tQywQ==}
 
-  yuku-ast@0.18.1:
-    resolution: {integrity: sha512-Y9YgmYeExF+13IOm4r9pTgmQiCVJtrhq014st78eAckWlCkbjzNd2AVrQHng5uiLz9j31O4sGYhuP3znSKJv9w==}
+  yuku-ast@0.19.0:
+    resolution: {integrity: sha512-PyCsiScaelhxBGzL8dyeJkLqvRZycoh78R31Vrt/WqYrm0hMFoKwIw/X7Dx5mBKLWAMlV9I9HEyBOHnj2gZVyw==}
     engines: {node: '>=14.18.0'}
 
-  yuku-codegen@0.18.1:
-    resolution: {integrity: sha512-0tNgBfNHW6+tEBGEf1N20C6tDsFR9Vj344Ey01wgAMeP+j0zR5WBF8dyzOu5oA/n6Yz6YqV1ZcASdi0cin+q8A==}
+  yuku-codegen@0.19.0:
+    resolution: {integrity: sha512-uymAKHjDuaP4BEpkXC/BSLz4DUEF5oArZ5AuD3888nb2miChjWSgpPdojEJxm3pjpXkgUaCRJQyNAbnMN33wHg==}
     engines: {node: '>=14.18.0'}
 
-  yuku-core@0.18.1:
-    resolution: {integrity: sha512-8PEOCKEi7r3nPY5cF0ZtJJSQj0ftwd0GC4En8fDQIP3nxw5ysSDwM0RcEuyHBblowRb82ad9AsExpqnKXAtC1Q==}
+  yuku-core@0.19.0:
+    resolution: {integrity: sha512-kYK9e1XdfirNhkipzW0wmMcSWcVF/CWnuugodfVYRCUwvoBefweL9HzB96OiKEhsx78V5WbUxbJqlizMX869Qg==}
     engines: {node: '>=14.18.0'}
 
-  yuku-parser@0.18.1:
-    resolution: {integrity: sha512-t5pANCF6k9rgJre7jk8DMAU4lEoI1oWWZgXk0fcvmCYQquFVWv0rf6Awwt56nnPiHb0E24dhtrpfgf9ChTCbrQ==}
+  yuku-parser@0.19.0:
+    resolution: {integrity: sha512-XrBh9ZiQK5mJVRxZBAvD6LwRyAYrK3MFtH3+onyuxFL5hFD44EC3QOmIC1FjTj6H2MMwq46/NAI+NZxLZPZgxg==}
     engines: {node: '>=14.18.0'}
 
   zwitch@2.0.4:
@@ -3316,7 +3319,7 @@ snapshots:
       '@clack/prompts': 1.8.1
       '@manypkg/get-packages': 3.1.0
       '@pnpm/deps.graph-sequencer': 1100.0.1
-      cac: 7.0.1
+      cac: 7.1.0
       import-meta-resolve: 4.2.0
       launch-editor: 2.14.2
       package-manager-detector: 1.9.0
@@ -4177,18 +4180,18 @@ snapshots:
       - utf-8-validate
       - vue-tsc
 
-  '@savvy-web/changelog@1.0.17(supports-color@8.1.1)':
+  '@savvy-web/changelog@1.0.18(supports-color@8.1.1)':
     dependencies:
       '@effected/commands': 0.12.0(effect@4.0.3)
       '@effected/git': 0.21.0(effect@4.0.3)
       '@effected/templates': 0.11.0(effect@4.0.3)
       '@effected/workspaces': 0.33.0(effect@4.0.3)
-      '@savvy-web/silk-effects': 9.5.1(@effected/commands@0.12.0(effect@4.0.3))(@effected/git@0.21.0(effect@4.0.3))(@effected/templates@0.11.0(effect@4.0.3))(@effected/workspaces@0.33.0(effect@4.0.3))(effect@4.0.3)(supports-color@8.1.1)
+      '@savvy-web/silk-effects': 9.5.2(@effected/commands@0.12.0(effect@4.0.3))(@effected/git@0.21.0(effect@4.0.3))(@effected/templates@0.11.0(effect@4.0.3))(@effected/workspaces@0.33.0(effect@4.0.3))(effect@4.0.3)(supports-color@8.1.1)
       effect: 4.0.3
     transitivePeerDependencies:
       - supports-color
 
-  '@savvy-web/cli@3.7.6(@effected/config-file@0.15.0(@effected/glob@0.11.0(effect@4.0.3))(@effected/jsonc@0.16.0(effect@4.0.3))(@effected/toml@0.12.0(effect@4.0.3))(@effected/walker@0.16.0(@effected/glob@0.11.0(effect@4.0.3))(effect@4.0.3))(@effected/yaml@0.20.0(effect@4.0.3))(effect@4.0.3))(redis@6.3.0)(supports-color@8.1.1)':
+  '@savvy-web/cli@3.7.7(@effected/config-file@0.15.0(@effected/glob@0.11.0(effect@4.0.3))(@effected/jsonc@0.16.0(effect@4.0.3))(@effected/toml@0.12.0(effect@4.0.3))(@effected/walker@0.16.0(@effected/glob@0.11.0(effect@4.0.3))(effect@4.0.3))(@effected/yaml@0.20.0(effect@4.0.3))(effect@4.0.3))(redis@6.3.0)(supports-color@8.1.1)':
     dependencies:
       '@effect/platform-node': 4.0.3(effect@4.0.3)(redis@6.3.0)
       '@effected/cli': 0.17.0(@effected/config-file@0.15.0(@effected/glob@0.11.0(effect@4.0.3))(@effected/jsonc@0.16.0(effect@4.0.3))(@effected/toml@0.12.0(effect@4.0.3))(@effected/walker@0.16.0(@effected/glob@0.11.0(effect@4.0.3))(effect@4.0.3))(@effected/yaml@0.20.0(effect@4.0.3))(effect@4.0.3))(@effected/env@0.2.0(effect@4.0.3))(@effected/glob@0.11.0(effect@4.0.3))(@effected/walker@0.16.0(@effected/glob@0.11.0(effect@4.0.3))(effect@4.0.3))(effect@4.0.3)(ink@8.0.0(react@19.3.0))(react@19.3.0)
@@ -4202,7 +4205,7 @@ snapshots:
       '@effected/walker': 0.16.0(@effected/glob@0.11.0(effect@4.0.3))(effect@4.0.3)
       '@effected/workspaces': 0.33.0(effect@4.0.3)
       '@effected/yaml': 0.20.0(effect@4.0.3)
-      '@savvy-web/silk-effects': 9.5.1(@effected/commands@0.12.0(effect@4.0.3))(@effected/git@0.21.0(effect@4.0.3))(@effected/templates@0.11.0(effect@4.0.3))(@effected/workspaces@0.33.0(effect@4.0.3))(effect@4.0.3)(supports-color@8.1.1)
+      '@savvy-web/silk-effects': 9.5.2(@effected/commands@0.12.0(effect@4.0.3))(@effected/git@0.21.0(effect@4.0.3))(@effected/templates@0.11.0(effect@4.0.3))(@effected/workspaces@0.33.0(effect@4.0.3))(effect@4.0.3)(supports-color@8.1.1)
       effect: 4.0.3
       ink: 8.0.0(react@19.3.0)
       react: 19.3.0
@@ -4215,7 +4218,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@savvy-web/mcp@3.4.9(redis@6.3.0)(supports-color@8.1.1)':
+  '@savvy-web/mcp@3.4.10(redis@6.3.0)(supports-color@8.1.1)':
     dependencies:
       '@effect/platform-node': 4.0.3(effect@4.0.3)(redis@6.3.0)
       '@effected/commands': 0.12.0(effect@4.0.3)
@@ -4224,7 +4227,7 @@ snapshots:
       '@effected/mcp': 0.6.0(@effected/engine@0.5.0(effect@4.0.3))(effect@4.0.3)
       '@effected/templates': 0.11.0(effect@4.0.3)
       '@effected/workspaces': 0.33.0(effect@4.0.3)
-      '@savvy-web/silk-effects': 9.5.1(@effected/commands@0.12.0(effect@4.0.3))(@effected/git@0.21.0(effect@4.0.3))(@effected/templates@0.11.0(effect@4.0.3))(@effected/workspaces@0.33.0(effect@4.0.3))(effect@4.0.3)(supports-color@8.1.1)
+      '@savvy-web/silk-effects': 9.5.2(@effected/commands@0.12.0(effect@4.0.3))(@effected/git@0.21.0(effect@4.0.3))(@effected/templates@0.11.0(effect@4.0.3))(@effected/workspaces@0.33.0(effect@4.0.3))(effect@4.0.3)(supports-color@8.1.1)
       effect: 4.0.3
     transitivePeerDependencies:
       - bufferutil
@@ -4232,14 +4235,14 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@savvy-web/silk-core@0.4.11(@effected/templates@0.11.0(effect@4.0.3))(@effected/workspaces@0.33.0(effect@4.0.3))(effect@4.0.3)':
+  '@savvy-web/silk-core@0.4.12(@effected/templates@0.11.0(effect@4.0.3))(@effected/workspaces@0.33.0(effect@4.0.3))(effect@4.0.3)':
     dependencies:
       '@effected/github-references': 0.8.0(effect@4.0.3)
       '@effected/templates': 0.11.0(effect@4.0.3)
       '@effected/workspaces': 0.33.0(effect@4.0.3)
       effect: 4.0.3
 
-  '@savvy-web/silk-effects@9.5.1(@effected/commands@0.12.0(effect@4.0.3))(@effected/git@0.21.0(effect@4.0.3))(@effected/templates@0.11.0(effect@4.0.3))(@effected/workspaces@0.33.0(effect@4.0.3))(effect@4.0.3)(supports-color@8.1.1)':
+  '@savvy-web/silk-effects@9.5.2(@effected/commands@0.12.0(effect@4.0.3))(@effected/git@0.21.0(effect@4.0.3))(@effected/templates@0.11.0(effect@4.0.3))(@effected/workspaces@0.33.0(effect@4.0.3))(effect@4.0.3)(supports-color@8.1.1)':
     dependencies:
       '@changesets/apply-release-plan': 8.1.1
       '@changesets/assemble-release-plan': 7.0.0
@@ -4262,7 +4265,7 @@ snapshots:
       '@effected/workspaces': 0.33.0(effect@4.0.3)
       '@effected/yaml': 0.20.0(effect@4.0.3)
       '@manypkg/get-packages': 3.1.0
-      '@savvy-web/silk-core': 0.4.11(@effected/templates@0.11.0(effect@4.0.3))(@effected/workspaces@0.33.0(effect@4.0.3))(effect@4.0.3)
+      '@savvy-web/silk-core': 0.4.12(@effected/templates@0.11.0(effect@4.0.3))(@effected/workspaces@0.33.0(effect@4.0.3))(effect@4.0.3)
       effect: 4.0.3
       mdast-util-heading-range: 4.0.0
       mdast-util-to-string: 4.0.0
@@ -4276,7 +4279,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@savvy-web/silk@4.3.9(@changesets/cli@3.0.3)(@commitlint/cli@21.2.3(@types/node@26.6.5)(conventional-commits-parser@7.1.3)(typescript@7.0.2))(@commitlint/config-conventional@21.2.3)(@effected/config-file@0.15.0(@effected/glob@0.11.0(effect@4.0.3))(@effected/jsonc@0.16.0(effect@4.0.3))(@effected/toml@0.12.0(effect@4.0.3))(@effected/walker@0.16.0(@effected/glob@0.11.0(effect@4.0.3))(effect@4.0.3))(@effected/yaml@0.20.0(effect@4.0.3))(effect@4.0.3))(@types/bun@1.4.2)(@types/node@26.6.5)(@vitest/coverage-istanbul@5.0.4)(@vitest/coverage-v8@5.0.4)(@vitest/expect@5.0.4)(husky@9.1.7)(lint-staged@17.6.0)(markdownlint-cli2-formatter-codequality@0.0.8(markdownlint-cli2@0.23.3(supports-color@8.1.1)))(markdownlint-cli2@0.23.3(supports-color@8.1.1))(redis@6.3.0)(supports-color@8.1.1)(tsx@4.23.15)(turbo@2.11.7)(typescript@7.0.2)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.6.1)(tsx@4.23.15)(yaml@2.9.1))(vitest@5.0.4)':
+  '@savvy-web/silk@4.3.10(@changesets/cli@3.0.3)(@commitlint/cli@21.2.3(@types/node@26.6.5)(conventional-commits-parser@7.1.3)(typescript@7.0.2))(@commitlint/config-conventional@21.2.3)(@effected/config-file@0.15.0(@effected/glob@0.11.0(effect@4.0.3))(@effected/jsonc@0.16.0(effect@4.0.3))(@effected/toml@0.12.0(effect@4.0.3))(@effected/walker@0.16.0(@effected/glob@0.11.0(effect@4.0.3))(effect@4.0.3))(@effected/yaml@0.20.0(effect@4.0.3))(effect@4.0.3))(@types/bun@1.4.3)(@types/node@26.6.5)(@vitest/coverage-istanbul@5.0.4)(@vitest/coverage-v8@5.0.4)(@vitest/expect@5.0.4)(husky@9.1.7)(lint-staged@17.6.0)(markdownlint-cli2-formatter-codequality@0.0.8(markdownlint-cli2@0.23.3(supports-color@8.1.1)))(markdownlint-cli2@0.23.3(supports-color@8.1.1))(redis@6.3.0)(supports-color@8.1.1)(tsx@4.23.15)(turbo@2.11.7)(typescript@7.0.2)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.6.1)(tsx@4.23.15)(yaml@2.9.1))(vitest@5.0.4)':
     dependencies:
       '@changesets/cli': 3.0.3
       '@commitlint/cli': 21.2.3(@types/node@26.6.5)(conventional-commits-parser@7.1.3)(typescript@7.0.2)
@@ -4285,11 +4288,11 @@ snapshots:
       '@effected/git': 0.21.0(effect@4.0.3)
       '@effected/templates': 0.11.0(effect@4.0.3)
       '@effected/workspaces': 0.33.0(effect@4.0.3)
-      '@savvy-web/changelog': 1.0.17(supports-color@8.1.1)
-      '@savvy-web/cli': 3.7.6(@effected/config-file@0.15.0(@effected/glob@0.11.0(effect@4.0.3))(@effected/jsonc@0.16.0(effect@4.0.3))(@effected/toml@0.12.0(effect@4.0.3))(@effected/walker@0.16.0(@effected/glob@0.11.0(effect@4.0.3))(effect@4.0.3))(@effected/yaml@0.20.0(effect@4.0.3))(effect@4.0.3))(redis@6.3.0)(supports-color@8.1.1)
-      '@savvy-web/mcp': 3.4.9(redis@6.3.0)(supports-color@8.1.1)
-      '@savvy-web/silk-effects': 9.5.1(@effected/commands@0.12.0(effect@4.0.3))(@effected/git@0.21.0(effect@4.0.3))(@effected/templates@0.11.0(effect@4.0.3))(@effected/workspaces@0.33.0(effect@4.0.3))(effect@4.0.3)(supports-color@8.1.1)
-      '@types/bun': 1.4.2
+      '@savvy-web/changelog': 1.0.18(supports-color@8.1.1)
+      '@savvy-web/cli': 3.7.7(@effected/config-file@0.15.0(@effected/glob@0.11.0(effect@4.0.3))(@effected/jsonc@0.16.0(effect@4.0.3))(@effected/toml@0.12.0(effect@4.0.3))(@effected/walker@0.16.0(@effected/glob@0.11.0(effect@4.0.3))(effect@4.0.3))(@effected/yaml@0.20.0(effect@4.0.3))(effect@4.0.3))(redis@6.3.0)(supports-color@8.1.1)
+      '@savvy-web/mcp': 3.4.10(redis@6.3.0)(supports-color@8.1.1)
+      '@savvy-web/silk-effects': 9.5.2(@effected/commands@0.12.0(effect@4.0.3))(@effected/git@0.21.0(effect@4.0.3))(@effected/templates@0.11.0(effect@4.0.3))(@effected/workspaces@0.33.0(effect@4.0.3))(effect@4.0.3)(supports-color@8.1.1)
+      '@types/bun': 1.4.3
       '@types/node': 26.6.5
       '@vitest/coverage-istanbul': 5.0.4(vitest@5.0.4)
       '@vitest/coverage-v8': 5.0.4(vitest@5.0.4)
@@ -4396,9 +4399,9 @@ snapshots:
 
   '@types/argparse@1.0.38': {}
 
-  '@types/bun@1.4.2':
+  '@types/bun@1.4.3':
     dependencies:
-      bun-types: 1.4.2
+      bun-types: 1.4.3
 
   '@types/chai@5.2.3':
     dependencies:
@@ -4737,43 +4740,43 @@ snapshots:
       convert-source-map: 2.0.0
       tinyrainbow: 3.2.0
 
-  '@yuku-core/binding-android-arm64@0.18.1':
+  '@yuku-core/binding-android-arm64@0.19.0':
     optional: true
 
-  '@yuku-core/binding-darwin-arm64@0.18.1':
+  '@yuku-core/binding-darwin-arm64@0.19.0':
     optional: true
 
-  '@yuku-core/binding-darwin-x64@0.18.1':
+  '@yuku-core/binding-darwin-x64@0.19.0':
     optional: true
 
-  '@yuku-core/binding-freebsd-x64@0.18.1':
+  '@yuku-core/binding-freebsd-x64@0.19.0':
     optional: true
 
-  '@yuku-core/binding-linux-arm-gnu@0.18.1':
+  '@yuku-core/binding-linux-arm-gnu@0.19.0':
     optional: true
 
-  '@yuku-core/binding-linux-arm-musl@0.18.1':
+  '@yuku-core/binding-linux-arm-musl@0.19.0':
     optional: true
 
-  '@yuku-core/binding-linux-arm64-gnu@0.18.1':
+  '@yuku-core/binding-linux-arm64-gnu@0.19.0':
     optional: true
 
-  '@yuku-core/binding-linux-arm64-musl@0.18.1':
+  '@yuku-core/binding-linux-arm64-musl@0.19.0':
     optional: true
 
-  '@yuku-core/binding-linux-x64-gnu@0.18.1':
+  '@yuku-core/binding-linux-x64-gnu@0.19.0':
     optional: true
 
-  '@yuku-core/binding-linux-x64-musl@0.18.1':
+  '@yuku-core/binding-linux-x64-musl@0.19.0':
     optional: true
 
-  '@yuku-core/binding-win32-arm64@0.18.1':
+  '@yuku-core/binding-win32-arm64@0.19.0':
     optional: true
 
-  '@yuku-core/binding-win32-x64@0.18.1':
+  '@yuku-core/binding-win32-x64@0.19.0':
     optional: true
 
-  '@yuku-toolchain/types@0.18.1': {}
+  '@yuku-toolchain/types@0.19.0': {}
 
   acorn-typescript@1.4.13(acorn@8.19.0):
     dependencies:
@@ -4857,11 +4860,12 @@ snapshots:
       node-releases: 2.0.58
       update-browserslist-db: 1.3.4(browserslist@4.29.3)
 
-  bun-types@1.4.2:
+  bun-types@1.4.3:
     dependencies:
       '@types/node': 26.6.5
+      undici-types: 8.11.2
 
-  cac@7.0.1: {}
+  cac@7.1.0: {}
 
   callsites@3.1.0: {}
 
@@ -5904,29 +5908,29 @@ snapshots:
 
   reusify@1.1.0: {}
 
-  rolldown-plugin-dts@0.28.7(rolldown@1.2.13)(typescript@6.0.3):
+  rolldown-plugin-dts@0.28.8(rolldown@1.2.13)(typescript@6.0.3):
     dependencies:
       dts-resolver: 3.0.0
       get-tsconfig: 5.0.0-beta.6
       obug: 3.0.0
       rolldown: 1.2.13
-      yuku-ast: 0.18.1
-      yuku-codegen: 0.18.1
-      yuku-parser: 0.18.1
+      yuku-ast: 0.19.0
+      yuku-codegen: 0.19.0
+      yuku-parser: 0.19.0
     optionalDependencies:
       typescript: 6.0.3
     transitivePeerDependencies:
       - oxc-resolver
 
-  rolldown-plugin-dts@0.28.7(rolldown@1.2.13)(typescript@7.0.2):
+  rolldown-plugin-dts@0.28.8(rolldown@1.2.13)(typescript@7.0.2):
     dependencies:
       dts-resolver: 3.0.0
       get-tsconfig: 5.0.0-beta.6
       obug: 3.0.0
       rolldown: 1.2.13
-      yuku-ast: 0.18.1
-      yuku-codegen: 0.18.1
-      yuku-parser: 0.18.1
+      yuku-ast: 0.19.0
+      yuku-codegen: 0.19.0
+      yuku-parser: 0.19.0
     optionalDependencies:
       typescript: 7.0.2
     transitivePeerDependencies:
@@ -6047,7 +6051,7 @@ snapshots:
 
   tsdown@0.23.1(@tsdown/exe@0.23.1)(tsx@4.23.15)(typescript@6.0.3):
     dependencies:
-      cac: 7.0.1
+      cac: 7.1.0
       defu: 6.1.7
       empathic: 2.1.0
       hookable: 6.1.2
@@ -6055,7 +6059,7 @@ snapshots:
       obug: 3.0.0
       picomatch: 4.0.7
       rolldown: 1.2.13
-      rolldown-plugin-dts: 0.28.7(rolldown@1.2.13)(typescript@6.0.3)
+      rolldown-plugin-dts: 0.28.8(rolldown@1.2.13)(typescript@6.0.3)
       tinyexec: 1.3.1
       tinyglobby: 0.2.17
       tree-kill: 1.2.2
@@ -6074,7 +6078,7 @@ snapshots:
 
   tsdown@0.23.1(@tsdown/exe@0.23.1)(tsx@4.23.15)(typescript@7.0.2):
     dependencies:
-      cac: 7.0.1
+      cac: 7.1.0
       defu: 6.1.7
       empathic: 2.1.0
       hookable: 6.1.2
@@ -6082,7 +6086,7 @@ snapshots:
       obug: 3.0.0
       picomatch: 4.0.7
       rolldown: 1.2.13
-      rolldown-plugin-dts: 0.28.7(rolldown@1.2.13)(typescript@7.0.2)
+      rolldown-plugin-dts: 0.28.8(rolldown@1.2.13)(typescript@7.0.2)
       tinyexec: 1.3.1
       tinyglobby: 0.2.17
       tree-kill: 1.2.2
@@ -6149,6 +6153,8 @@ snapshots:
     dependencies:
       '@quansync/fs': 1.1.0
       quansync: 1.0.0
+
+  undici-types@8.11.2: {}
 
   undici-types@8.9.0: {}
 
@@ -6301,34 +6307,34 @@ snapshots:
 
   yoga-layout@3.2.1: {}
 
-  yuku-ast@0.18.1:
+  yuku-ast@0.19.0:
     dependencies:
-      '@yuku-toolchain/types': 0.18.1
+      '@yuku-toolchain/types': 0.19.0
 
-  yuku-codegen@0.18.1:
+  yuku-codegen@0.19.0:
     dependencies:
-      '@yuku-toolchain/types': 0.18.1
+      '@yuku-toolchain/types': 0.19.0
 
-  yuku-core@0.18.1:
+  yuku-core@0.19.0:
     dependencies:
-      '@yuku-toolchain/types': 0.18.1
+      '@yuku-toolchain/types': 0.19.0
     optionalDependencies:
-      '@yuku-core/binding-android-arm64': 0.18.1
-      '@yuku-core/binding-darwin-arm64': 0.18.1
-      '@yuku-core/binding-darwin-x64': 0.18.1
-      '@yuku-core/binding-freebsd-x64': 0.18.1
-      '@yuku-core/binding-linux-arm-gnu': 0.18.1
-      '@yuku-core/binding-linux-arm-musl': 0.18.1
-      '@yuku-core/binding-linux-arm64-gnu': 0.18.1
-      '@yuku-core/binding-linux-arm64-musl': 0.18.1
-      '@yuku-core/binding-linux-x64-gnu': 0.18.1
-      '@yuku-core/binding-linux-x64-musl': 0.18.1
-      '@yuku-core/binding-win32-arm64': 0.18.1
-      '@yuku-core/binding-win32-x64': 0.18.1
+      '@yuku-core/binding-android-arm64': 0.19.0
+      '@yuku-core/binding-darwin-arm64': 0.19.0
+      '@yuku-core/binding-darwin-x64': 0.19.0
+      '@yuku-core/binding-freebsd-x64': 0.19.0
+      '@yuku-core/binding-linux-arm-gnu': 0.19.0
+      '@yuku-core/binding-linux-arm-musl': 0.19.0
+      '@yuku-core/binding-linux-arm64-gnu': 0.19.0
+      '@yuku-core/binding-linux-arm64-musl': 0.19.0
+      '@yuku-core/binding-linux-x64-gnu': 0.19.0
+      '@yuku-core/binding-linux-x64-musl': 0.19.0
+      '@yuku-core/binding-win32-arm64': 0.19.0
+      '@yuku-core/binding-win32-x64': 0.19.0
 
-  yuku-parser@0.18.1:
+  yuku-parser@0.19.0:
     dependencies:
-      '@yuku-toolchain/types': 0.18.1
-      yuku-core: 0.18.1
+      '@yuku-toolchain/types': 0.19.0
+      yuku-core: 0.19.0
 
   zwitch@2.0.4: {}
