@@ -39,7 +39,7 @@
 		"minimatch": "^10.2.6"
 	},
 	"devDependencies": {
-		"@savvy-web/bundler": "^2.5.2",
+		"@savvy-web/bundler": "^2.5.3",
 		"@types/node": "catalog:build",
 		"tsx": "catalog:silk",
 		"typescript": "catalog:build",
