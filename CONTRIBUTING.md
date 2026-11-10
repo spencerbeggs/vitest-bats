@@ -83,8 +83,7 @@ pnpm vitest run __test__/hello.test.ts
 
 ```bash
 cd package
-pnpm run build:dev    # Development build
-pnpm run build:prod   # Production build
+pnpm run build        # Build every publish target
 ```
 
 ## Code Style

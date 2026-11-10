@@ -5,7 +5,7 @@
 // `package/src/matchers.ts`, but Microsoft API Extractor strips
 // `declare module` blocks during the dist .d.ts roll-up. This local
 // ambient mirrors the augmentation so the root workspace's typecheck
-// (which resolves `vitest-bats` from `dist/dev`) still sees the matchers.
+// (which resolves the built plugin from `dist/prod`) still sees the matchers.
 // Keep in sync with `package/src/matchers.ts`.
 // =================================================================
 

@@ -1,5 +1,7 @@
 import { defineConfig } from "vitest/config";
-import { BatsPlugin } from "vitest-bats";
+// The config loads in plain Node, which cannot run package/src, so it takes the
+// built plugin. The test scripts run `turbo run build` before vitest.
+import { BatsPlugin } from "./package/dist/prod/npm/pkg/index.js";
 
 export default defineConfig({
 	plugins: [BatsPlugin({ deps: "warn" })],
