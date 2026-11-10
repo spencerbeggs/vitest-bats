@@ -50,19 +50,29 @@ See `package/CLAUDE.md` for package-specific guidance.
 
 ## Build Pipeline
 
-This project uses
-[@savvy-web/rslib-builder](https://github.com/savvy-web/rslib-builder) to
-produce dual build outputs via [Rslib](https://rslib.rs/):
+The package builds with `effected package build` from
+[@effected/plugin](https://www.npmjs.com/package/@effected/plugin), a root
+devDependency. There is no `effected.toml`: the defaults fit this package.
 
 | Output | Directory | Purpose |
 | ------ | --------- | ------- |
-| Development | `package/dist/dev/` | Local development with source maps |
-| Production | `package/dist/npm/` | Published to npm and GitHub Packages |
+| npm | `package/dist/prod/npm/pkg/` | Published to npm |
+| GitHub Packages | `package/dist/prod/github/pkg/` | Published as `@spencerbeggs/vitest-bats` |
+
+`publishConfig.targets` in `package/package.json` decides the publish groups.
+Each build writes `package/dist/prod/issues.json`: read `buildOk` first, then
+treat its errors and any `ciFatal` warning as failures. API Extractor findings
+are warnings locally and errors in CI.
+
+Workspace links resolve `vitest-bats` through `exports` to `package/src/`.
+The root `vitest.config.ts` loads in plain Node, which cannot run `src/`, so it
+imports the built plugin from `package/dist/prod/npm/pkg/index.js`. Every root
+test script runs `turbo run build` first for that reason.
 
 ### How `private: true` Works
 
 The source `package.json` files are marked `"private": true` -- this is
-intentional. During the build, rslib-builder reads `publishConfig` and
+intentional. During the build, the bundler reads `publishConfig` and
 transforms the output `package.json` (sets `private: false`, rewrites exports,
 strips dev fields). Never manually set `"private": false` in source.
 
@@ -70,8 +80,8 @@ strips dev fields). Never manually set `"private": false` in source.
 
 [Turbo](https://turbo.build/) manages build task dependencies and caching:
 
-- `types:check` runs first (no dependencies)
-- `build:dev` and `build:prod` both depend on `types:check`
+- `types:check` depends on `^types:check` (nothing must be built first)
+- `build` depends on `types:check`
 - Cache excludes: `*.md`, `.changeset/**`, `.claude/**`, `.github/**`,
   `.husky/**`, `.vscode/**`
 - Environment pass-through: `GITHUB_ACTIONS`, `CI`
@@ -95,9 +105,7 @@ pnpm run test:coverage     # Run tests with v8 coverage report
 ### Building
 
 ```bash
-pnpm run build             # Build dev + prod outputs via Turbo
-pnpm run build:dev         # Build development output only
-pnpm run build:prod        # Build production/npm output only
+pnpm run build             # Build the package via Turbo (effected package build)
 ```
 
 ## Code Quality and Hooks
@@ -174,7 +182,7 @@ changing the coverage pipeline. **Do NOT load unless directly relevant.**
 
 | Package | Purpose |
 | ------- | ------- |
-| rslib-builder | Build pipeline, dual output, package.json transform |
+| bundler | Former build pipeline (replaced by `effected package build`) |
 | commitlint | Conventional commit + DCO enforcement |
 | changesets | Versioning, changelogs, release management |
 | lint-staged | Pre-commit file linting via Biome |

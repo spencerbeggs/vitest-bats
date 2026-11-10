@@ -102,13 +102,13 @@ as structured `MockCall` entries on `BatsResult`.
 
 ## Build
 
-Uses `@savvy-web/rslib-builder`. The source `private: true` is correct -- the
-builder transforms it based on `publishConfig.access`.
+Uses `effected package build` from `@effected/plugin`. The source
+`private: true` is correct -- the bundler transforms it based on
+`publishConfig.access`. Output lands in `dist/prod/<target>/pkg/`.
 
 ```bash
 cd package
-pnpm run build:dev         # Development build
-pnpm run build:prod        # Production build
+pnpm run build             # Build every publish target
 ```
 
 ## Coverage Environment

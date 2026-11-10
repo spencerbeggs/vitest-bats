@@ -26,9 +26,7 @@
 		"./setup": "./src/setup.ts"
 	},
 	"scripts": {
-		"build:dev": "node savvy.build.ts --target dev",
-		"build:prod": "node savvy.build.ts --target prod",
-		"prepare": "node savvy.build.ts --target dev",
+		"build": "effected package build",
 		"types:check": "tsc --noEmit"
 	},
 	"dependencies": {
@@ -39,10 +37,9 @@
 		"minimatch": "^10.2.6"
 	},
 	"devDependencies": {
-		"@savvy-web/bundler": "^2.7.4",
-		"@types/node": "catalog:build",
-		"tsx": "catalog:silk",
-		"typescript": "catalog:build",
+		"@types/node": "catalog:effected:build",
+		"tsx": "catalog:effected:build",
+		"typescript": "catalog:effected:build",
 		"vite": "catalog:docs"
 	},
 	"peerDependencies": {
@@ -58,8 +55,6 @@
 	},
 	"publishConfig": {
 		"access": "public",
-		"directory": "dist/dev/pkg",
-		"linkDirectory": true,
 		"targets": {
 			"npm": true,
 			"github": "@spencerbeggs/vitest-bats"
