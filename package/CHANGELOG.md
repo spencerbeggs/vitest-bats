@@ -1,5 +1,13 @@
 # vitest-bats
 
+## 0.0.5
+
+### Dependencies
+
+| Dependency | Type | Action | From | To |
+| --- | --- | --- | --- | --- |
+| minimatch | dependency | updated | ^11.0.5 | ^11.0.6 |
+
 ## 0.0.4
 
 ### Dependencies
