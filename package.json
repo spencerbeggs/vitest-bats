@@ -41,8 +41,8 @@
 	},
 	"devDependencies": {
 		"@effected/plugin": "catalog:effected",
-		"@okfit/plugin": "^0.5.34",
-		"@savvy-web/silk": "^5.1.2",
+		"@okfit/plugin": "^0.5.35",
+		"@savvy-web/silk": "^5.1.3",
 		"@vitest-agent/plugin": "^6.0.1",
 		"vitest-bats": "workspace:*"
 	},
