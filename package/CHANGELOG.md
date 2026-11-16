@@ -1,5 +1,13 @@
 # vitest-bats
 
+## 0.0.7
+
+### Dependencies
+
+| Dependency | Type | Action | From | To |
+| --- | --- | --- | --- | --- |
+| fast-xml-parser | dependency | updated | ^5.12.0 | ^5.12.1 |
+
 ## 0.0.6
 
 ### Dependencies
