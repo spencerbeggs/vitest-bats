@@ -256,8 +256,8 @@ importers:
         specifier: ^0.5.37
         version: 0.5.37(@effected/memfs@0.26.2(effect@4.1.4))(redis@6.3.1)
       '@savvy-web/silk':
-        specifier: ^5.1.5
-        version: 5.1.5(@changesets/cli@3.0.3)(@commitlint/cli@21.2.4(conventional-commits-parser@7.1.4)(typescript@7.1.0-beta))(@commitlint/config-conventional@21.2.4)(@types/bun@1.4.4)(@types/node@26.6.6)(@vitest/coverage-istanbul@5.1.0)(@vitest/coverage-v8@5.1.0)(@vitest/expect@5.1.0)(husky@9.1.7)(lint-staged@17.6.1)(markdownlint-cli2-formatter-codequality@0.0.8(markdownlint-cli2@0.24.1(supports-color@8.1.1)))(markdownlint-cli2@0.24.1(supports-color@8.1.1))(react@19.3.1)(redis@6.3.1)(tsx@4.23.15)(turbo@2.11.11)(typescript@7.1.0-beta)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(vitest@5.1.0)
+        specifier: ^5.1.6
+        version: 5.1.6(@changesets/cli@3.0.3)(@commitlint/cli@21.2.4(conventional-commits-parser@7.1.4)(typescript@7.1.0-beta))(@commitlint/config-conventional@21.2.4)(@types/bun@1.4.4)(@types/node@26.6.6)(@vitest/coverage-istanbul@5.1.0)(@vitest/coverage-v8@5.1.0)(@vitest/expect@5.1.0)(husky@9.1.7)(lint-staged@17.6.1)(markdownlint-cli2-formatter-codequality@0.0.8(markdownlint-cli2@0.24.1(supports-color@8.1.1)))(markdownlint-cli2@0.24.1(supports-color@8.1.1))(react@19.3.1)(redis@6.3.1)(tsx@4.23.15)(turbo@2.11.11)(typescript@7.1.0-beta)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(vitest@5.1.0)
       '@vitest-agent/plugin':
         specifier: ^6.0.1
         version: 6.0.15(@effected/jsonc@0.25.0(effect@4.1.4))(@effected/toml@0.20.0(effect@4.1.4))(@effected/yaml@0.30.0(effect@4.1.4))(@vitest/coverage-istanbul@5.1.0)(@vitest/coverage-v8@5.1.0)(ink@8.0.0(react@19.3.1))(react@19.3.1)(redis@6.3.1)(vitest@5.1.0)
@@ -1449,8 +1449,8 @@ packages:
   '@savvy-web/changelog@1.0.37':
     resolution: {integrity: sha512-IsDaNAc6F4cnYWzyrD9vAROnsa74oOh5fJMBanGzMYqEnJdErTe8jhSM+XY+TczJFIFXhsZ5R4hyJIJidrU+Eg==}
 
-  '@savvy-web/cli@3.8.5':
-    resolution: {integrity: sha512-RalNnSHLnFMuzAPsfN6bXnWxH5R51iBAnKSlaM6q+e03nVRKyK71dJNFj/C2VfOp9EpXS5aOkrow7sJt2E1pTw==}
+  '@savvy-web/cli@3.8.6':
+    resolution: {integrity: sha512-gCgjEhUb5G1FzfBNx+CSCJYl8gAVqzP6MKcJSzPETUP+Qn0db0X0kBWCrB/l591PT49Q+z8/P8vrZP4V3GIFaQ==}
     hasBin: true
 
   '@savvy-web/mcp@3.6.5':
@@ -1476,11 +1476,11 @@ packages:
       '@effected/workspaces': ^0.48.0
       effect: 4.1.4
 
-  '@savvy-web/silk@5.1.5':
-    resolution: {integrity: sha512-ihU0OXipiytP8nqwvK9e8hSOWYn0PJsBHu+/AjBDY+AKUWM0UmCu/FT0bk629QBHSE9kxmws5cnRF8XuYTAipw==}
+  '@savvy-web/silk@5.1.6':
+    resolution: {integrity: sha512-s7DQBYMRAR7rpeUZhcx751+TnjlMnJacjGhvFaii0hl7t8IRaofEHo3buF9AfUyKIU6jl68Ab0MjFgREGgnkNQ==}
     hasBin: true
     peerDependencies:
-      '@biomejs/biome': 2.6.6
+      '@biomejs/biome': 2.6.8
       '@changesets/cli': ^3.0.3
       '@commitlint/cli': ^21.2.4
       '@commitlint/config-conventional': ^21.2.4
@@ -1488,20 +1488,20 @@ packages:
       '@types/node': ^26.6.0
       '@types/react': ^19.3.0
       '@types/react-dom': ^19.3.0
-      '@vitest/coverage-istanbul': ^5.0.5
-      '@vitest/coverage-v8': ^5.0.5
-      '@vitest/expect': ^5.0.5
+      '@vitest/coverage-istanbul': ^5.1.0
+      '@vitest/coverage-v8': ^5.1.0
+      '@vitest/expect': ^5.1.0
       husky: ^9.1.7
-      lint-staged: ^17.6.0
-      markdownlint-cli2: ^0.24.0
+      lint-staged: ^17.6.1
+      markdownlint-cli2: ^0.24.1
       markdownlint-cli2-formatter-codequality: ^0.0.8
       react: ^19.3.0
       react-dom: ^19.3.0
       tsx: ^4.23.15
-      turbo: ^2.11.10
+      turbo: ^2.11.11
       typescript: 7.1.0-beta
-      vite: ^8.3.5
-      vitest: ^5.0.5
+      vite: ^8.3.8
+      vitest: ^5.1.0
     peerDependenciesMeta:
       '@biomejs/biome':
         optional: true
@@ -4298,7 +4298,7 @@ snapshots:
       - redis
       - utf-8-validate
 
-  '@savvy-web/cli@3.8.5(redis@6.3.1)':
+  '@savvy-web/cli@3.8.6(redis@6.3.1)':
     dependencies:
       '@effect/platform-node': 4.1.4(effect@4.1.4)(redis@6.3.1)
       '@effected/changesets': 0.6.1(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@effected/markdown-lint@0.2.0(@effected/jsonc@0.25.0(effect@4.1.4))(@effected/toml@0.20.0(effect@4.1.4))(@effected/yaml@0.30.0(effect@4.1.4))(effect@4.1.4))(@effected/markdown@0.29.0(@effected/jsonc@0.25.0(effect@4.1.4))(@effected/toml@0.20.0(effect@4.1.4))(@effected/yaml@0.30.0(effect@4.1.4))(effect@4.1.4))(@effected/npm@0.35.1(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@effected/semver@0.24.0(effect@4.1.4))(effect@4.1.4))(effect@4.1.4)
@@ -4388,7 +4388,7 @@ snapshots:
     transitivePeerDependencies:
       - '@effect/platform-node'
 
-  '@savvy-web/silk@5.1.5(@changesets/cli@3.0.3)(@commitlint/cli@21.2.4(conventional-commits-parser@7.1.4)(typescript@7.1.0-beta))(@commitlint/config-conventional@21.2.4)(@types/bun@1.4.4)(@types/node@26.6.6)(@vitest/coverage-istanbul@5.1.0)(@vitest/coverage-v8@5.1.0)(@vitest/expect@5.1.0)(husky@9.1.7)(lint-staged@17.6.1)(markdownlint-cli2-formatter-codequality@0.0.8(markdownlint-cli2@0.24.1(supports-color@8.1.1)))(markdownlint-cli2@0.24.1(supports-color@8.1.1))(react@19.3.1)(redis@6.3.1)(tsx@4.23.15)(turbo@2.11.11)(typescript@7.1.0-beta)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(vitest@5.1.0)':
+  '@savvy-web/silk@5.1.6(@changesets/cli@3.0.3)(@commitlint/cli@21.2.4(conventional-commits-parser@7.1.4)(typescript@7.1.0-beta))(@commitlint/config-conventional@21.2.4)(@types/bun@1.4.4)(@types/node@26.6.6)(@vitest/coverage-istanbul@5.1.0)(@vitest/coverage-v8@5.1.0)(@vitest/expect@5.1.0)(husky@9.1.7)(lint-staged@17.6.1)(markdownlint-cli2-formatter-codequality@0.0.8(markdownlint-cli2@0.24.1(supports-color@8.1.1)))(markdownlint-cli2@0.24.1(supports-color@8.1.1))(react@19.3.1)(redis@6.3.1)(tsx@4.23.15)(turbo@2.11.11)(typescript@7.1.0-beta)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(vitest@5.1.0)':
     dependencies:
       '@changesets/cli': 3.0.3
       '@commitlint/cli': 21.2.4(conventional-commits-parser@7.1.4)(typescript@7.1.0-beta)
@@ -4408,7 +4408,7 @@ snapshots:
       '@effected/workspaces': 0.48.1(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(effect@4.1.4)
       '@effected/yaml': 0.30.0(effect@4.1.4)
       '@savvy-web/changelog': 1.0.37(redis@6.3.1)
-      '@savvy-web/cli': 3.8.5(redis@6.3.1)
+      '@savvy-web/cli': 3.8.6(redis@6.3.1)
       '@savvy-web/mcp': 3.6.5(redis@6.3.1)
       '@savvy-web/silk-effects': 13.0.1(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@effected/changesets@0.6.1(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@effected/markdown-lint@0.2.0(@effected/jsonc@0.25.0(effect@4.1.4))(@effected/toml@0.20.0(effect@4.1.4))(@effected/yaml@0.30.0(effect@4.1.4))(effect@4.1.4))(@effected/markdown@0.29.0(@effected/jsonc@0.25.0(effect@4.1.4))(@effected/toml@0.20.0(effect@4.1.4))(@effected/yaml@0.30.0(effect@4.1.4))(effect@4.1.4))(@effected/npm@0.35.1(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@effected/semver@0.24.0(effect@4.1.4))(effect@4.1.4))(effect@4.1.4))(@effected/commands@0.22.0(effect@4.1.4))(@effected/git@0.32.0(effect@4.1.4))(@effected/github@0.33.0(effect@4.1.4))(@effected/npm@0.35.1(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@effected/semver@0.24.0(effect@4.1.4))(effect@4.1.4))(@effected/templates@0.20.0(effect@4.1.4))(@effected/workspaces@0.48.1(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(effect@4.1.4))(effect@4.1.4)
       '@types/bun': 1.4.4
