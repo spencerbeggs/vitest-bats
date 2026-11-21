@@ -1,5 +1,13 @@
 # vitest-bats
 
+## 0.0.9
+
+### Dependencies
+
+| Dependency | Type | Action | From | To |
+| --- | --- | --- | --- | --- |
+| vitest | peerDependency | updated | ^5.0.0 | ^5.1.0 |
+
 ## 0.0.8
 
 ### Dependencies
